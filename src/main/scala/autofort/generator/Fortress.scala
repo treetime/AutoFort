@@ -1,10 +1,10 @@
 package autofort.generator
 
-import autofort.abstractions.map.GridMap
-import autofort.abstractions.model.aesthetics.StyleGuide
-import autofort.abstractions.model.embark.Embark
-import autofort.abstractions.model.fortress.FortressModel
-import autofort.abstractions.model.fortress.fortress.FortressComponent
+import autofort.model.map.GridMap
+import autofort.model.aesthetics.StyleGuide
+import autofort.model.embark.Embark
+import autofort.model.fortress.FortressModel
+import autofort.model.fortress.fortress.FortressComponent
 
 trait Area
 
