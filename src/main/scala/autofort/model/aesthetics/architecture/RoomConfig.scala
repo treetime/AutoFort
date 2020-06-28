@@ -2,12 +2,10 @@ package autofort.model.aesthetics.architecture
 
 import autofort.model.aesthetics.architecture.RoomConfig.PlaceableConfig
 import autofort.model.aesthetics.architecture.arrangement.ArrangementConfig
-import autofort.model.fortress.arrangement.placeables.Placeable
+import autofort.model.aesthetics.architecture.arrangement.placeables.Placeable
 
 case class RoomConfig(
-  areaConfig: AreaConfig,
-  placeableConfig: PlaceableConfig,
-  arrangementStrategy: ArrangementConfig
+
 ) { //rules for making rooms
 
 }

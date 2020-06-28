@@ -1,4 +1,4 @@
-package autofort.model.fortress.arrangement.placeables
+package autofort.model.aesthetics.architecture.arrangement.placeables
 
 
 object Furniture {

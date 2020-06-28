@@ -8,7 +8,7 @@ import autofort.model.aesthetics.architecture.{AreaConfig, RoomConfig}
 import autofort.model.aesthetics.{ArchitectureConfig, StyleGuide}
 import autofort.model.fortress.FortressModel.FortressComponent
 import autofort.model.fortress.arrangement.ArrangementGroup.DiningSet
-import autofort.model.fortress.arrangement.placeables.Furniture.Table
+import autofort.model.aesthetics.architecture.arrangement.placeables.Furniture.Table
 import autofort.util.Rounding._
 
 trait Shelter extends FortressComponent {
@@ -23,7 +23,7 @@ trait Shelter extends FortressComponent {
   def generate(population: Int, config: ArchitectureConfig) = {
     val scale: Int = 5
     val placeables = Shelter.generatePlaceables(population)
-    val room: RoomDefinition = config.defineRoom(scale) //spec scale from minsquarea required
+    val room: RoomDefinition = config.defineRoom(population) //spec scale from minsquarea required
 
   }
 

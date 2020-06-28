@@ -11,9 +11,8 @@ case class ArrangementConfig(center: CenterConfig, perimeter: PerimeterConfig)
 object ArrangementConfig {
 
   trait CenterConfig {
-    def parition(area: AreaDefinition) = {
+    def parition(area: AreaDefinition): (AreaDefinition, AreaDefinition) = {
       area.center.subSpaces()
-
     }
   }
 

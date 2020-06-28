@@ -1,9 +1,9 @@
-package autofort.model.fortress.arrangement.placeables
+package autofort.model.aesthetics.architecture.arrangement.placeables
 
-import autofort.model.fortress.arrangement.placeables.Placeable.Dimensions
+import autofort.model.aesthetics.architecture.arrangement.placeables.Placeable.Dimensions
 import autofort.model.map.GridBlock
 
-case class Placeable(dim: Dimensions = Dimensions(1,1), location: Set[GridBlock] = Set.empty) { // top left corner?
+case class Placeable(dim: Dimensions = Dimensions(1,1), location: Set[GridBlock] = Set.empty, priority: Int = 0) { // top left corner?
   def place(l: Set[GridBlock]): Placeable = {
     if (l.size == dim.size) {
       copy(location = l)
@@ -25,5 +25,6 @@ object Placeable {
     assert(x > 0 && y > 0)
     def size: Int = x * y
   }
+
 
 }

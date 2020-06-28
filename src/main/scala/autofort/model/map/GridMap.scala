@@ -3,7 +3,7 @@ package autofort.model.map
 import GridMap._
 import autofort.model.map.AreaMap.XYMap
 import autofort.model.aesthetics.materials.Material
-import autofort.model.fortress.arrangement.placeables.Placeable
+import autofort.model.aesthetics.architecture.arrangement.placeables.Placeable
 
 case class GridMap(levels: Vector[GridLevel]) extends AreaMap[GridBlock](levels)
 
