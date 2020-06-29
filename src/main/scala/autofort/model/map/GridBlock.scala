@@ -1,26 +1,64 @@
 package autofort.model.map
 
-import autofort.model.placeables.Placeable
-import autofort.model.map.GridBlock.{FloorTile, Point, WallTile}
-import autofort.model.map.GridMap.XYDimensions
+import java.lang.Math.{abs, pow, sqrt}
+
+import autofort.model.aesthetics.architecture.room.TableArrangement._
+import autofort.model.aesthetics.architecture.shape.AreaDefinition
 import autofort.model.aesthetics.materials.Material
+import autofort.model.map.GridBlock.{FloorTile, Point, WallTile}
+import autofort.model.placeables.Placeable
 
 case class GridBlock(location: Point,
                      floor: Option[FloorTile] = None,
                      wall: Option[WallTile] = None,
-                     placeable: Option[Placeable] = None)
-    extends XYDimensions {
+                     placeable: Option[Placeable] = None) {
   val x: Int = location.x
   val y: Int = location.y
+  lazy val r: Double = sqrt(pow(x, 2) + pow(y, 2))
+
   def withFloor(floorTile: Option[FloorTile]): GridBlock =
     copy(floor = floorTile)
   def withWall(wallTile: Option[WallTile]): GridBlock = copy(wall = wallTile)
   def withPlaceable(placeableTile: Option[Placeable]): GridBlock =
     copy(placeable = placeableTile)
 
-  def moveX(i: Int): GridBlock = copy(location = location.copy(x = x + i))
-  def moveY(i: Int): GridBlock = copy(location = location.copy(y = y + i))
+  def move(dx: Int = 0, dy: Int = 0, dz: Int = 0): GridBlock =
+    copy(location = location.move(dx, dy, dz))
 
+  def classifyIn(area: AreaDefinition): PerimeterBlockType = {
+    if (isInternalCornerOf(area)) {
+      InternalCorner
+    } else if (isExternalCornerOf(area)) {
+      ExternalCorner
+    } else if (isDetachableFromPerimeterOf(area)) {
+      Detachable
+    } else {
+      Normal
+    }
+  }
+
+  def isInternalCornerOf(area: AreaDefinition): Boolean =
+    countNeighborsIn(area) == 7
+
+  def isExternalCornerOf(area: AreaDefinition): Boolean =
+    getNeighborsIn(area.perimeter, !_.isDetachableFromPerimeterOf(area)).size == 2
+
+  def isDetachableFromPerimeterOf(area: AreaDefinition): Boolean =
+    area.perimeter.contains(this) && (area.perimeter - this).isContinuous
+
+  def countNeighborsIn(area: AreaDefinition,
+                       f: GridBlock => Boolean = (x => true)): Int = {
+    getNeighborsIn(area).size
+  }
+
+  def getNeighborsIn(area: AreaDefinition,
+                     f: GridBlock => Boolean = (x => true)): Set[GridBlock] = {
+    area.area.filter(b => this.touches(b) && f(b))
+  }
+
+  def touches(other: GridBlock): Boolean = {
+    abs(x - other.x) <= 1 && Math.abs(y - other.y) <= 1 && !((x == other.x) && (y == other.y))
+  }
 
 
 }
@@ -29,7 +67,10 @@ object GridBlock {
   def apply(x: Int = 0, y: Int = 0, z: Int = 0): GridBlock =
     new GridBlock(Point(x, y, z))
 
-  case class Point(x: Int, y: Int, z: Int)
+  case class Point(x: Int, y: Int, z: Int) {
+    def move(dx: Int, dy: Int, dz: Int): Point =
+      copy(x = x + dx, y = y + dy, z = z + dz)
+  }
 
   case class FloorTile(material: Option[Material])
 

@@ -1,6 +1,7 @@
 package autofort.model.map
 
 import GridMap._
+import autofort.model.aesthetics.architecture.shape.AreaDefinition
 import autofort.model.placeables.Placeable
 import autofort.model.map.AreaMap.XYMap
 import autofort.model.aesthetics.materials.Material
@@ -31,16 +32,6 @@ object GridMap {
       .toVector
   )
 
-  trait XYDimensions {
-    val x, y: Int
-    def touches(other: XYDimensions): Boolean = {
-      Math.abs(x - other.x) <= 1 && Math.abs(y - other.y) <= 1
-    }
-
-    //def moveX: XYDimensions
-  //  def moveY: XYDimensions
-
-  }
 
   case class GridLevel(override val xy: Vector[Vector[GridBlock]])
       extends XYMap[GridBlock](xy) {

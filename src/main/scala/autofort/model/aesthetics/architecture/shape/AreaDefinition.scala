@@ -1,64 +1,64 @@
 package autofort.model.aesthetics.architecture.shape
 
+import autofort.model.aesthetics.architecture.room.TableArrangement.{
+  Detachable,
+  ExternalCorner,
+  InternalCorner,
+  Normal
+}
+import autofort.model.aesthetics.architecture.shape.AreaDefinition.{
+  CenterProfile,
+  PerimeterProfile,
+  SubSpaces
+}
+import autofort.model.aesthetics.preferences.Shapeliness
+import autofort.model.aesthetics.preferences.Shapeliness.{FAT, SQUARE, THIN}
 import autofort.model.map.GridBlock
-import autofort.model.aesthetics.architecture.shape.AreaDefinition.SubSpaces
 
-case class AreaDefinition(area: Set[GridBlock]) {
+case class AreaDefinition(area: Set[GridBlock],
+                          val rectangular: Boolean = false) {
 
-  lazy val w: Int = {
-    val xs = area.map(_.x)
-    xs.max - xs.min
-  }
-
-  lazy val h: Int = {
-    val ys = area.map(_.y)
-    ys.max - ys.min
-  }
-
+  lazy val w: Int = dist(_.x)
+  lazy val h: Int = dist(_.y)
+  lazy val shapeliness: Shapeliness =
+    if (w > h) FAT else if (w < h) THIN else SQUARE
   lazy val maxDimension: Int = Math.max(w, h)
+  lazy val minDimension: Int = Math.min(w, h)
+  lazy val (center, perimeter) =
+    area.partition(block => block.countNeighborsIn(this) == 8) match {
+      case (cent, peri) => (AreaDefinition(cent), AreaDefinition(peri))
+    }
+  lazy val profilePerimeter: PerimeterProfile =
+    PerimeterProfile.fromAreaDefinition(this)
+  lazy val centerProfile: CenterProfile = CenterProfile(center.subSpaces)
+  lazy val largestRectangle: AreaDefinition = area
+    .map(findLargestRectangle)
+    .groupBy(_.area.size)
+    .maxBy(_._1)
+    ._2
+    .minBy(_.leftTop.r) //favour things that are more left, then more top
 
-  def isRectangular: Boolean = w == h
-
-  lazy val (center, perimeter) = area.partition { gridBlock =>
-    area.count(b => b.touches(gridBlock)) == 8
-  } match {
-    case (cent, peri) => (AreaDefinition(cent), AreaDefinition(peri))
+  def -(that: GridBlock): AreaDefinition = {
+    assert(area(that), "can't remove what it does not contain")
+    copy(area = area - that)
   }
+
+  def isSquare: Boolean =
+    isRectangular && (largestRectangle.w == largestRectangle.h)
+
+  def isRectangular: Boolean = largestRectangle.contains(this)
+
+  def contains(block: GridBlock): Boolean = area(block)
 
   def size: Int = area.size
 
-  def largestSquare: Int = {
-    (0 until maxDimension).map(countSquares).zipWithIndex.maxBy(_._1)._2
+  def isContinuous: Boolean = {
+    perimeter.area.forall(b => b.countNeighborsIn(perimeter) >= 2)
   }
 
-  def countSquares(sideLength: Int): Int = {
-    area.count { block: GridBlock =>
-      (0 until sideLength).forall { h =>
-        (0 until sideLength).forall { v =>
-          area.exists { b =>
-            b.x == block.x + h &&
-            b.y == block.y + v
-          }
-        }
-      }
-    }
-  }
+  def leftTop: GridBlock = area.minBy(_.r)
 
-  def profileArea: Double = {
-    val range = (0 until maxDimension)
-    range.map(countSquares).sum.toDouble / range
-      .map(theoreticalMax)
-      .sum
-      .toDouble
-  }
-
-  private def theoreticalMax(sideLength: Int): Int = {
-    val xMax = w - sideLength
-    val yMax = h - sideLength
-    if (xMax > 0 && yMax > 0) xMax * yMax else 0
-  }
-
-  def subSpaces(): SubSpaces = {
+  def subSpaces: SubSpaces = {
     @scala.annotation.tailrec
     def breakIntoComponents(
       source: AreaDefinition = this,
@@ -67,19 +67,27 @@ case class AreaDefinition(area: Set[GridBlock]) {
       if (source.isEmpty) {
         components
       } else {
-        val thisRect = source.area
-          .map(largestRectangle)
-          .groupBy(_.area.size)
-          .maxBy(_._1)
-          ._2
-          .minBy(_.leftTop)
-        breakIntoComponents(source - thisRect, components + thisRect)
+        breakIntoComponents(
+          source - source.largestRectangle,
+          components + source.largestRectangle
+        )
       }
     }
     SubSpaces(breakIntoComponents())
   }
 
-  private def largestRectangle(block: GridBlock): AreaDefinition = {
+  def -(that: AreaDefinition): AreaDefinition = {
+    assert(this contains that, "can't remove what you don't have.")
+    copy(area = area diff that.area)
+  }
+
+  def contains(that: AreaDefinition): Boolean = that.area subsetOf this.area
+
+  def isEmpty: Boolean = area.isEmpty
+
+  private def dist(f: GridBlock => Int) = f(area.maxBy(f)) - f(area.minBy(f))
+
+  private def findLargestRectangle(block: GridBlock): AreaDefinition = {
     @scala.annotation.tailrec
     def findLargest(
       block: GridBlock,
@@ -98,29 +106,19 @@ case class AreaDefinition(area: Set[GridBlock]) {
     findLargest(block)
   }
 
-  private def getRectangle(start: GridBlock, x: Int, y: Int): Option[AreaDefinition] = {
+  def >(that: AreaDefinition): Boolean =
+    this.area.size > that.area.size
+
+  private def getRectangle(start: GridBlock,
+                           x: Int,
+                           y: Int): Option[AreaDefinition] = {
     val blocks = (0 until x).flatMap { px =>
       (0 until y).map { py =>
-        start.moveX(px).moveY(py)
+        start.move(px, py)
       }
     }.toSet
     Option.when(blocks.subsetOf(area))(AreaDefinition(blocks))
   }
-
-  def >(that: AreaDefinition): Boolean =
-    this.area.size > that.area.size
-
-  def -(that: AreaDefinition): AreaDefinition = {
-    assert(this contains that, "Can't remove what you don't have.") //@TODO remove debug code
-    copy(area = area diff that.area)
-  }
-
-  def contains(that: AreaDefinition): Boolean = that.area subsetOf this.area
-
-  def leftTop: GridBlock =
-    area.groupBy(_.x).minBy(_._1)._2.minBy(_.y) //smallest x, then smallest y
-
-  def isEmpty: Boolean = area.isEmpty
 
 }
 
@@ -146,15 +144,44 @@ object AreaDefinition {
     }.toSet
   }
 
+  private def apply(area: Set[GridBlock],
+                    rectangular: Boolean): AreaDefinition =
+    new AreaDefinition(area, rectangular)
+
   case class SubSpaces(rectangles: Map[Int, AreaDefinition]) {
 
-    def map(f: (Int, AreaDefinition) => (Int, AreaDefinition)): SubSpaces = copy(rectangles = rectangles.toSeq.map(f))
+    def map(f: ((Int, AreaDefinition)) => (Int, AreaDefinition)): SubSpaces =
+      copy(rectangles = rectangles.toSeq.map(f).toMap)
 
+  }
+
+  case class PerimeterProfile(internal: Set[GridBlock],
+                              external: Set[GridBlock],
+                              detachable: Set[GridBlock],
+                              lineSpaces: SubSpaces)
+
+  case class CenterProfile(centerSpaces: SubSpaces)
+
+  object PerimeterProfile {
+
+    def fromAreaDefinition(areaDefinition: AreaDefinition): PerimeterProfile = {
+      val profile = areaDefinition.perimeter.area
+        .groupBy(_.classifyIn(areaDefinition))
+        .withDefault(_ => Set.empty[GridBlock])
+
+      PerimeterProfile(
+        profile(InternalCorner),
+        profile(ExternalCorner),
+        profile(Detachable),
+        AreaDefinition(profile(Normal)).subSpaces
+      )
+    }
   }
 
   object SubSpaces {
 
-    def apply(items: Set[AreaDefinition]): SubSpaces = new SubSpaces(items.groupBy(_.size))
+    def apply(items: Set[AreaDefinition]): SubSpaces =
+      new SubSpaces(items.groupBy(_.size))
 
     def scaleRoom(reference: SubSpaces)
 
