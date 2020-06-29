@@ -1,6 +1,6 @@
-package autofort.model.aesthetics.architecture.arrangement.placeables
+package autofort.model.placeables
 
-import autofort.model.aesthetics.architecture.arrangement.placeables.Placeable.Dimensions
+import Placeable.Dimensions
 import autofort.model.map.GridBlock
 
 case class Placeable(dim: Dimensions = Dimensions(1,1), location: Set[GridBlock] = Set.empty, priority: Int = 0) { // top left corner?

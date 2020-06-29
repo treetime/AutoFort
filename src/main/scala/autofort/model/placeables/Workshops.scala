@@ -1,4 +1,4 @@
-package autofort.model.aesthetics.architecture.arrangement.placeables
+package autofort.model.placeables
 
 import autofort.model.fortress.arrangement.Placeable.Dimensions
 

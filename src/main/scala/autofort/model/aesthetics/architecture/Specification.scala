@@ -1,28 +1,19 @@
 package autofort.model.aesthetics.architecture
 
-import autofort.model.aesthetics.architecture.RoomConfig.PlaceableConfig
-import autofort.model.aesthetics.architecture.arrangement.ArrangementConfig
-import autofort.model.aesthetics.architecture.arrangement.placeables.Placeable
-
-case class RoomConfig(
-
-) { //rules for making rooms
-
+trait Specification {
+  def specify(population: Int): Int
 }
 
-object RoomConfig {
+object Specification {
 
   /**
-    * Not really a min and max, but it's useful for thinking about how you size your rooms
-    */
+   * Not really a min and max, but it's useful for thinking about how you size your rooms
+   */
   private val MIN_DWARVES = 7
   private val MAX_DWARVES = 200
   private val deltaDWARVES = (p: Int) =>
     (MAX_DWARVES - p) / (MAX_DWARVES - MIN_DWARVES)
 
-  trait Specification {
-    def specify(population: Int): Int
-  }
 
   trait FloorCeil {
     val floor: Option[Int]
@@ -37,7 +28,7 @@ object RoomConfig {
                     max: Int,
                     floor: Option[Int] = None,
                     ceil: Option[Int] = None)
-      extends Specification
+    extends Specification
       with FloorCeil {
     def specify(population: Int): Int = {
       limit(deltaDWARVES(population) * (max - min))
@@ -48,18 +39,10 @@ object RoomConfig {
                    ratio: Double,
                    floor: Option[Int] = None,
                    ceil: Option[Int] = None)
-      extends Specification
+    extends Specification
       with FloorCeil {
     def specify(population: Int): Int = {
       limit(Math.round(min + ratio * population).toInt)
     }
   }
-
-  case class PlaceableConfig(specs: (Placeable, Specification)*) {
-    def generate(population: Int): Seq[Placeable] = specs.flatMap {
-      case (item, spec) =>
-        (0 until spec.specify(population)).map(_ => item.copy())
-    }
-  }
-
 }

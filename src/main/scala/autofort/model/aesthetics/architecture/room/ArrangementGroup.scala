@@ -1,4 +1,4 @@
-package autofort.model.aesthetics.architecture.arrangement
+package autofort.model.aesthetics.architecture.room
 
 trait ArrangementGroup
 

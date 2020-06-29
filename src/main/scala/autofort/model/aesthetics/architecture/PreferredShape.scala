@@ -1,15 +1,17 @@
 package autofort.model.aesthetics.architecture
-import autofort.model.aesthetics.ArchitectureConfig.RoomDefinition
-import autofort.model.aesthetics.architecture.shape.{AreaDefinition, ShapeDefinition, ShapePoint}
+import autofort.model.aesthetics.architecture.room.RoomDefinition
+import autofort.model.aesthetics.architecture.shape.{
+  AreaDefinition,
+  ShapeDefinition,
+  ShapePoint
+}
 
 trait PreferredShape {
   val shape: ShapeDefinition
   val scale: Int //side length of the shortest side of the shape in blocks
 
   def generateRoom(scale: Int): RoomDefinition = {
-    RoomDefinition(
-      AreaDefinition.fromShape(shape, scale)
-    )
+    RoomDefinition(AreaDefinition.fromShape(shape, scale))
   }
 }
 

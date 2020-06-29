@@ -20,12 +20,7 @@ class FortressModel() {
 
 object FortressModel {
 
-  trait FortressComponent {
-    val id: Int
-
-    def generate(population: Int, style: StyleGuide): FortressComponent
-
-  }
+  trait FortressComponent
 
 
   object FortPriorityOrder extends Enumeration {

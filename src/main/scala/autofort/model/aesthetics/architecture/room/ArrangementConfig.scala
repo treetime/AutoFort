@@ -1,7 +1,5 @@
-package autofort.model.aesthetics.architecture.arrangement
+package autofort.model.aesthetics.architecture.room
 
-import autofort.model.aesthetics.architecture.AreaConfig
-import autofort.model.aesthetics.architecture.arrangement.ArrangementConfig.{CenterConfig, PerimeterConfig}
 import autofort.model.aesthetics.architecture.shape.AreaDefinition
 
 //groups of what? spaced how? xx . xx . vs xxx .. xxx ..

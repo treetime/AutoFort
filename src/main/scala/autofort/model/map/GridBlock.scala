@@ -1,9 +1,9 @@
 package autofort.model.map
 
+import autofort.model.placeables.Placeable
 import autofort.model.map.GridBlock.{FloorTile, Point, WallTile}
 import autofort.model.map.GridMap.XYDimensions
 import autofort.model.aesthetics.materials.Material
-import autofort.model.aesthetics.architecture.arrangement.placeables.Placeable
 
 case class GridBlock(location: Point,
                      floor: Option[FloorTile] = None,
