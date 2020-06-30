@@ -15,7 +15,7 @@ object Offcenteredness extends Preferable[Offcenteredness] {
   case object RECTANGULAR_OUT extends Offcenteredness
   case object RECTANGULAR_IN extends Offcenteredness
 
-  override def getChoices: Seq[Orientation] = Seq(
+  override def getChoices: Seq[Offcenteredness] = Seq(
     UP_LEFT,
       UP_RIGHT,
       DOWN_LEFT,

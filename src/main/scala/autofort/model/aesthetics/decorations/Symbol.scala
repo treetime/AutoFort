@@ -1,5 +1,5 @@
 package autofort.model.aesthetics.decorations
 
-import autofort.model.map.GridMap.Point
+import autofort.model.map.GridBlock.Point
 
 case class Symbol(definition: Set[Point])

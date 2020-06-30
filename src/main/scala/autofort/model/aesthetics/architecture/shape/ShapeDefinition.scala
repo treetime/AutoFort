@@ -51,7 +51,7 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
   def transform(
     scalingFactor: Double
   )(func: ShapePoint => ShapePoint): ShapeDefinition = {
-    ShapeDefinition(shapePoints.map(func))
+    copy(shapePoints = shapePoints.map(func))
   }
 }
 
@@ -60,6 +60,6 @@ object ShapeDefinition {
   val yScale = 1000
 
   def fromPoints(points: ShapePoint*): ShapeDefinition =
-    new ShapeDefinition(points.toIndexedSeq).normalise()
+    new ShapeDefinition(points.toIndexedSeq)
 
 }

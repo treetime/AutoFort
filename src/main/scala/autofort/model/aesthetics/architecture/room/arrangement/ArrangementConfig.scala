@@ -1,18 +1,17 @@
-package autofort.model.aesthetics.architecture.room
+package autofort.model.aesthetics.architecture.room.arrangement
 
-import autofort.model.aesthetics.architecture.shape.AreaDefinition
+import autofort.model.aesthetics.architecture.room.arrangement.ArrangementConfig.{
+  CenterConfig,
+  PerimeterConfig
+}
 
 //groups of what? spaced how? xx . xx . vs xxx .. xxx ..
 
-case class ArrangementConfig(center: CenterConfig, perimeter: PerimeterConfig)
+case class ArrangementConfig(center: CenterConfig, perimeter: PerimeterConfig) {}
 
 object ArrangementConfig {
 
-  trait CenterConfig {
-    def parition(area: AreaDefinition): (AreaDefinition, AreaDefinition) = {
-      area.center.subSpaces()
-    }
-  }
+  trait CenterConfig
 
   trait PerimeterConfig
 

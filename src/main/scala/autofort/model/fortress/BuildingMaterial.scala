@@ -1,7 +1,7 @@
 package autofort.model.fortress
 
-import FortressModel.{BuildingMaterial, FortressComponent}
-
+import autofort.model.fortress.FortressModel.FortressComponent
+trait BuildingMaterial extends FortressComponent
 
 object BuildingMaterial {
 

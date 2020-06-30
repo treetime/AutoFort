@@ -5,16 +5,17 @@ import java.lang.Math.{abs, pow, sqrt}
 import autofort.model.aesthetics.architecture.room.TableArrangement._
 import autofort.model.aesthetics.architecture.shape.AreaDefinition
 import autofort.model.aesthetics.materials.Material
-import autofort.model.map.GridBlock.{FloorTile, Point, WallTile}
+import autofort.model.map.GridBlock.{FloorTile, Point, WallSymbol, WallTile}
+import autofort.model.map.wall.WallTile.Point
 import autofort.model.placeables.Placeable
 
 case class GridBlock(location: Point,
                      floor: Option[FloorTile] = None,
                      wall: Option[WallTile] = None,
                      placeable: Option[Placeable] = None) {
+  lazy val r: Double = sqrt(pow(x, 2) + pow(y, 2))
   val x: Int = location.x
   val y: Int = location.y
-  lazy val r: Double = sqrt(pow(x, 2) + pow(y, 2))
 
   def withFloor(floorTile: Option[FloorTile]): GridBlock =
     copy(floor = floorTile)
@@ -60,19 +61,10 @@ case class GridBlock(location: Point,
     abs(x - other.x) <= 1 && Math.abs(y - other.y) <= 1 && !((x == other.x) && (y == other.y))
   }
 
-
 }
 
 object GridBlock {
   def apply(x: Int = 0, y: Int = 0, z: Int = 0): GridBlock =
     new GridBlock(Point(x, y, z))
 
-  case class Point(x: Int, y: Int, z: Int) {
-    def move(dx: Int, dy: Int, dz: Int): Point =
-      copy(x = x + dx, y = y + dy, z = z + dz)
-  }
-
-  case class FloorTile(material: Option[Material])
-
-  case class WallTile(material: Option[Material])
 }

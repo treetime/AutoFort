@@ -1,9 +1,9 @@
 package autofort.model.placeables
 
-import autofort.model.fortress.arrangement.Placeable.Dimensions
+import autofort.model.placeables.Placeable.Dimensions
 
 object Stockpiles {
 
-  case class Stockpile[T](x: Int, y: Int) extends Placeable(Dimensions(x, y))
+  case class Stockpile[T](x: Int, y: Int) extends Placeable
 
 }

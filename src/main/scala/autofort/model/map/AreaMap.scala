@@ -13,7 +13,7 @@ abstract class AreaMap[T](area: Vector[XYMap[T]]) {
 }
 
 object AreaMap {
-  case class XYMap[T](xy: Vector[Vector[T]]){
+  class XYMap[T](xy: Vector[Vector[T]]){
     def get(x: Int, y: Int): Option[T] = for {
       row <- xy.lift(x)
       point <- row.lift(y)

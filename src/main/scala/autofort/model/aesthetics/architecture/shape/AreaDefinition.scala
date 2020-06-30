@@ -15,15 +15,14 @@ import autofort.model.aesthetics.preferences.Shapeliness
 import autofort.model.aesthetics.preferences.Shapeliness.{FAT, SQUARE, THIN}
 import autofort.model.map.GridBlock
 
-case class AreaDefinition(area: Set[GridBlock],
-                          val rectangular: Boolean = false) {
+case class AreaDefinition(area: Set[GridBlock]) {
 
   lazy val w: Int = dist(_.x)
   lazy val h: Int = dist(_.y)
   lazy val shapeliness: Shapeliness =
     if (w > h) FAT else if (w < h) THIN else SQUARE
-  lazy val maxDimension: Int = Math.max(w, h)
-  lazy val minDimension: Int = Math.min(w, h)
+  lazy val largestDimension: Int = Math.max(w, h)
+  lazy val smallestDimension: Int = Math.min(w, h)
   lazy val (center, perimeter) =
     area.partition(block => block.countNeighborsIn(this) == 8) match {
       case (cent, peri) => (AreaDefinition(cent), AreaDefinition(peri))
@@ -126,7 +125,17 @@ object AreaDefinition {
 
   def empty: AreaDefinition = AreaDefinition(Set.empty)
 
+  /**
+   * Creates a room where the shortest side of the largest rectangle in the room is "scale"
+   * */
   def fromShape(shape: ShapeDefinition, scale: Int): AreaDefinition = {
+    val scalingFactor = 100
+    val bigArea = createAreaDefinition(shape, scalingFactor)
+    val scaledScale = Math.round(scale * (bigArea.smallestDimension / scalingFactor.toDouble)).toInt
+    createAreaDefinition(shape, scaledScale)
+  }
+
+  private def createAreaDefinition(shape: ShapeDefinition, scale: Int): AreaDefinition = {
     val xMax = Math.round(shape.xMax * scale).toInt
     val yMax = Math.round(shape.yMax * scale).toInt
     val conditions = shape.asConditions(scale) //gives rules to determine whether a block is inside or outside the shape
@@ -144,14 +153,11 @@ object AreaDefinition {
     }.toSet
   }
 
-  private def apply(area: Set[GridBlock],
-                    rectangular: Boolean): AreaDefinition =
-    new AreaDefinition(area, rectangular)
 
-  case class SubSpaces(rectangles: Map[Int, AreaDefinition]) {
+  case class SubSpaces(rectangles: Map[Int, Set[AreaDefinition]]) {
 
-    def map(f: ((Int, AreaDefinition)) => (Int, AreaDefinition)): SubSpaces =
-      copy(rectangles = rectangles.toSeq.map(f).toMap)
+  /*  def map(f: ((Int, AreaDefinition)) => (Int, AreaDefinition)): SubSpaces =
+      copy(rectangles = rectangles.map((size, definitions) => size -> definitions.map(f)).toMap)*/
 
   }
 
@@ -183,7 +189,7 @@ object AreaDefinition {
     def apply(items: Set[AreaDefinition]): SubSpaces =
       new SubSpaces(items.groupBy(_.size))
 
-    def scaleRoom(reference: SubSpaces)
+   // def scaleRoom(reference: SubSpaces) = ???
 
   }
 

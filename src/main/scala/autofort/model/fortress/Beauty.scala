@@ -1,6 +1,8 @@
 package autofort.model.fortress
 
-import FortressModel.Beauty
+import autofort.model.fortress.FortressModel.FortressComponent
+
+trait Beauty extends FortressComponent
 
 object Beauty {
 

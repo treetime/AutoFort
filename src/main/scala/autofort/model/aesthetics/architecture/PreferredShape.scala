@@ -10,8 +10,8 @@ trait PreferredShape {
   val shape: ShapeDefinition
   val scale: Int //side length of the shortest side of the shape in blocks
 
-  def generateRoom(scale: Int): RoomDefinition = {
-    RoomDefinition(AreaDefinition.fromShape(shape, scale))
+  def generateArea(scale: Int): AreaDefinition = {
+    AreaDefinition.fromShape(shape, scale)
   }
 }
 
