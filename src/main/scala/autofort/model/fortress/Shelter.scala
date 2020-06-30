@@ -4,7 +4,7 @@ import autofort.model.aesthetics.architecture.{ArchitectureConfig, AreaConfig}
 import autofort.model.aesthetics.architecture.Specification.MinMax
 import autofort.model.aesthetics.architecture.room.{PlaceableConfig, RoomDefinition}
 import autofort.model.fortress.FortressModel.FortressComponent
-import autofort.model.placeables.Placeable._
+import autofort.model.items.Item._
 
 trait Shelter extends FortressComponent {
 
@@ -13,7 +13,7 @@ trait Shelter extends FortressComponent {
   val areaConfig: AreaConfig = AreaConfig()
 
   val placeableConfig: PlaceableConfig = PlaceableConfig(
-    Throne() -> MinMax(4,)
+     -> MinMax(4,)
   )
 
   def generate(population: Int, config: ArchitectureConfig): RoomDefinition = {

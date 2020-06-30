@@ -1,6 +1,8 @@
 package autofort.model.aesthetics.architecture
 
-case class AreaConfig(areaSpecs: Seq[Specification]) {
+import autofort.model.aesthetics.architecture.room.TableArrangement
+
+case class AreaConfig(tablePlacementStrategy: TableArrangement) {
 
 }
 

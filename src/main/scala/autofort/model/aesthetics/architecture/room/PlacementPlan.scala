@@ -2,7 +2,7 @@ package autofort.model.aesthetics.architecture.room
 
 import autofort.model.aesthetics.architecture.room.PlacementPlan.Space
 
-class PlacementPlan(priority: Int, position: Space)
+trait PlacementPlan
 
 object PlacementPlan {
 

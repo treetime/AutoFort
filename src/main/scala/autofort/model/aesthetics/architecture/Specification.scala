@@ -7,13 +7,12 @@ trait Specification {
 object Specification {
 
   /**
-   * Not really a min and max, but it's useful for thinking about how you size your rooms
-   */
+    * Not really a min and max, but it's useful for thinking about how you size your rooms
+    */
   private val MIN_DWARVES = 7
   private val MAX_DWARVES = 200
   private val deltaDWARVES = (p: Int) =>
     (MAX_DWARVES - p) / (MAX_DWARVES - MIN_DWARVES)
-
 
   trait FloorCeil {
     val floor: Option[Int]
@@ -24,25 +23,15 @@ object Specification {
     }
   }
 
-  case class MinMax(min: Int,
-                    max: Int,
-                    floor: Option[Int] = None,
-                    ceil: Option[Int] = None)
-    extends Specification
-      with FloorCeil {
+  case class MinMax(min: Int, max: Int) extends Specification {
     def specify(population: Int): Int = {
-      limit(deltaDWARVES(population) * (max - min))
+      deltaDWARVES(population) * (max - min)
     }
   }
 
-  case class Ratio(min: Int,
-                   ratio: Double,
-                   floor: Option[Int] = None,
-                   ceil: Option[Int] = None)
-    extends Specification
-      with FloorCeil {
-    def specify(population: Int): Int = {
-      limit(Math.round(min + ratio * population).toInt)
+  case class FillPercent(percent: Double) extends Specification {
+    def specify(area: Int): Int = {
+      Math.round(min + Math.max(ratio * area - 4, 0)).toInt
     }
   }
 }

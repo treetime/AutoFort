@@ -2,14 +2,15 @@ package autofort.model.map
 
 import java.lang.Math.{abs, pow, sqrt}
 
+import autofort.model.aesthetics.architecture.room.{Detachable, ExternalCorner, InternalCorner, Normal, PerimeterBlockType}
 import autofort.model.aesthetics.architecture.room.TableArrangement._
+import autofort.model.items.Item
 import autofort.model.map.WallTile.Point
-import autofort.model.placeables.Placeable
 
 case class GridBlock(location: Point,
                      floor: Option[FloorTile] = None,
                      wall: Option[WallTile] = None,
-                     placeable: Option[Placeable] = None) {
+                     placeable: Option[Item] = None) {
   lazy val r: Double = sqrt(pow(x, 2) + pow(y, 2))
   val x: Int = location.x
   val y: Int = location.y
@@ -19,11 +20,14 @@ case class GridBlock(location: Point,
   def flipVertical(max: Int): GridBlock =
     copy(location = location.copy(y = max - location.y))
 
+  def flipHorizontal(max: Int): GridBlock =
+    copy(location = location.copy(x = max - location.x))
+
   def withFloor(floorTile: Option[FloorTile]): GridBlock =
     copy(floor = floorTile)
   def withWall(wallTile: Option[WallTile]): GridBlock = copy(wall = wallTile)
-  def withPlaceable(placeableTile: Placeable): GridBlock =
-    copy(placeable = Option(placeableTile))
+  def withItem(item: Item): GridBlock =
+    copy(placeable = Option(item))
 
   def move(dx: Int = 0, dy: Int = 0, dz: Int = 0): GridBlock =
     copy(location = location.move(dx, dy, dz))

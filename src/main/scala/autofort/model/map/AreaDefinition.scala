@@ -1,7 +1,9 @@
 package autofort.model.map
 
+import autofort.model.aesthetics.architecture.room.{Detachable, ExternalCorner, InternalCorner, Normal}
 import autofort.model.aesthetics.architecture.room.TableArrangement.{Detachable, ExternalCorner, InternalCorner, Normal}
 import autofort.model.aesthetics.architecture.shape.ShapeDefinition
+import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
 import autofort.model.map.AreaDefinition.{CenterProfile, PerimeterProfile, SubSpaces}
 
 class AreaDefinition(val area: Set[GridBlock]) {
@@ -80,6 +82,40 @@ class AreaDefinition(val area: Set[GridBlock]) {
 
   def max(f: GridBlock => Int): Int = f(area.maxBy(f))
 
+  def move(x: Int, y: Int): AreaDefinition =
+    new AreaDefinition(area.map(b => b.move(x, y)))
+
+  def attachTo(other: AreaDefinition,
+               direction: Direction = RIGHT): AreaDefinition =
+    direction match {
+      case UP    => new AreaDefinition(zeroAt(other.xMin, other.yMax))
+      case RIGHT => new AreaDefinition(zeroAt(other.xMax, other.yMin))
+      case LEFT  => other.attachTo(this, RIGHT)
+      case DOWN  => other.attachTo(this, UP)
+    }
+
+  def zeroAt(x: Int, y: Int): Set[GridBlock] = {
+    area.map(_.move(x - min(_.x), y - min(_.y)))
+  }
+
+  def rotate(direction: Direction): AreaDefinition = direction match {
+    case LEFT  => flipXY.flipVertical
+    case RIGHT => flipXY.flipHorizontal
+    case DOWN  => flipVertical.flipHorizontal
+    case UP    => flipVertical.flipHorizontal
+  }
+
+  def flipVertical: AreaDefinition =
+    new AreaDefinition(area.map(_.flipVertical(yMax).move(0, -yMax)))
+
+  def flipHorizontal: AreaDefinition =
+    new AreaDefinition(area.map(_.flipHorizontal(xMax).move(-xMax, 0)))
+
+  def flipXY: AreaDefinition = new AreaDefinition(area.map(_.transpose))
+
+  def withBlock(block: GridBlock): AreaDefinition =
+    new AreaDefinition(area + block)
+
   private def dist(f: GridBlock => Int) = f(area.maxBy(f)) - f(area.minBy(f))
 
   private def findLargestRectangle(block: GridBlock): AreaDefinition = {
@@ -114,8 +150,6 @@ class AreaDefinition(val area: Set[GridBlock]) {
     }.toSet
     Option.when(blocks.subsetOf(area))(AreaDefinition(blocks))
   }
-
-  def move(x: Int, y: Int): AreaDefinition = new AreaDefinition(area.map(b => b.move(x,y)))
 
 }
 
