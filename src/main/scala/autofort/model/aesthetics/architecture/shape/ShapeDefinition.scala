@@ -1,6 +1,12 @@
 package autofort.model.aesthetics.architecture.shape
 
-import autofort.model.aesthetics.architecture.shape.AreaDefinition.SubSpaces
+import autofort.model.aesthetics.architecture.shape.ShapeDefinition.{
+  Condition,
+  DOWN,
+  LEFT,
+  RIGHT,
+  UP
+}
 
 case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
   assert(shapePoints.nonEmpty)
@@ -13,15 +19,7 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
 
   def asConditions(scale: Int): Vector[Condition] = pairs.map(_.function(scale))
 
-  def pairs: Vector[ShapePointPair] = {
-    for {
-      last <- shapePoints.lastOption
-      first <- shapePoints.headOption
-    } yield (shapePoints zip shapePoints.drop(1)) :+ (last, first)
-  }.getOrElse(Seq.empty).zipWithIndex.map(ShapePointPair.apply).toVector
-
-  def validateShape: Boolean = {
-    import autofort.model.aesthetics.architecture.shape.Condition._
+  def validateShape: Boolean = { // only allow closed shapes
     val grouped = pairs
       .map(_.direction)
       .groupBy(identity)
@@ -33,7 +31,12 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
     grouped(LEFT) == grouped(RIGHT)
   }
 
-  //def sizeRoom(): SubSpaces = AreaDefinition.fromShape(this, 100).subSpaces()
+  def pairs: Vector[ShapePointPair] = {
+    for {
+      last <- shapePoints.lastOption
+      first <- shapePoints.headOption
+    } yield (shapePoints zip shapePoints.drop(1)) :+ (last, first)
+  }.getOrElse(Seq.empty).zipWithIndex.map(ShapePointPair.apply).toVector
 
   def normalise(): ShapeDefinition = { //normalises smallest dimension to 1
     val yScale = 1.0 / (yMax - yMin)
@@ -61,5 +64,27 @@ object ShapeDefinition {
 
   def fromPoints(points: ShapePoint*): ShapeDefinition =
     new ShapeDefinition(points.toIndexedSeq)
+
+  sealed trait Direction
+
+  /**
+    * Conditions define shape boundaries by providing rules for filtering blocks which aren't in the shape
+    * */
+  case class Condition(function: Int => Int, direction: Direction) {
+    def holds(x: Int, y: Int): Boolean = {
+      val result = function(x)
+      direction match {
+        case UP    => y >= result
+        case DOWN  => y <= result
+        case LEFT  => x <= result
+        case RIGHT => x >= result
+      }
+    }
+  }
+
+  case object UP extends Direction
+  case object DOWN extends Direction
+  case object LEFT extends Direction
+  case object RIGHT extends Direction
 
 }

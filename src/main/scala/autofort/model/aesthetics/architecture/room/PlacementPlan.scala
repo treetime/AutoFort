@@ -1,6 +1,6 @@
-package autofort.model.aesthetics.architecture.room.arrangement
+package autofort.model.aesthetics.architecture.room
 
-import autofort.model.aesthetics.architecture.room.arrangement.PlacementPlan.Space
+import autofort.model.aesthetics.architecture.room.PlacementPlan.Space
 
 class PlacementPlan(priority: Int, position: Space)
 

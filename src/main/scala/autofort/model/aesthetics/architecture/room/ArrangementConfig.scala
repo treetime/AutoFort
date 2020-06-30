@@ -1,19 +1,16 @@
-package autofort.model.aesthetics.architecture.room.arrangement
+package autofort.model.aesthetics.architecture.room
 
-import autofort.model.aesthetics.architecture.room.arrangement.ArrangementConfig.{
-  CenterConfig,
-  PerimeterConfig
-}
+import autofort.model.aesthetics.architecture.room.ArrangementConfig.{CenterConfig, PerimeterConfig}
 
 //groups of what? spaced how? xx . xx . vs xxx .. xxx ..
 
-case class ArrangementConfig(center: CenterConfig, perimeter: PerimeterConfig) {}
+trait ArrangementConfig
 
 object ArrangementConfig {
 
-  trait CenterConfig
+  trait CenterConfig extends ArrangementConfig
 
-  trait PerimeterConfig
+  trait PerimeterConfig extends ArrangementConfig
 
   case class Rings() extends CenterConfig
 

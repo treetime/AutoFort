@@ -1,18 +1,26 @@
 package autofort.model.fortress
 
-import autofort.model.aesthetics.architecture.ArchitectureConfig
-import autofort.model.aesthetics.architecture.room.RoomDefinition
+import autofort.model.aesthetics.architecture.{ArchitectureConfig, AreaConfig}
+import autofort.model.aesthetics.architecture.Specification.MinMax
+import autofort.model.aesthetics.architecture.room.{PlaceableConfig, RoomDefinition}
 import autofort.model.fortress.FortressModel.FortressComponent
+import autofort.model.placeables.Placeable._
 
 trait Shelter extends FortressComponent {
 
   val baseSize = 9
-  val scaling: Double = (800 - 9) / 200.0
+  val areaScaling: Double = (800 - 9) / 200.0
+  val areaConfig: AreaConfig = AreaConfig()
 
-  def generate(population: Int, config: ArchitectureConfig) = {
+  val placeableConfig: PlaceableConfig = PlaceableConfig(
+    Throne() -> MinMax(4,)
+  )
+
+  def generate(population: Int, config: ArchitectureConfig): RoomDefinition = {
     val scale: Int = 5
-    val room: RoomDefinition = config.defineRoom(population) //spec scale from minsquarea required
+    val room: RoomDefinition = config.defineRoom(population)
 
+    ???
   }
 
 }

@@ -3,10 +3,7 @@ package autofort.model.map
 import java.lang.Math.{abs, pow, sqrt}
 
 import autofort.model.aesthetics.architecture.room.TableArrangement._
-import autofort.model.aesthetics.architecture.shape.AreaDefinition
-import autofort.model.aesthetics.materials.Material
-import autofort.model.map.GridBlock.{FloorTile, Point, WallSymbol, WallTile}
-import autofort.model.map.wall.WallTile.Point
+import autofort.model.map.WallTile.Point
 import autofort.model.placeables.Placeable
 
 case class GridBlock(location: Point,
@@ -17,11 +14,16 @@ case class GridBlock(location: Point,
   val x: Int = location.x
   val y: Int = location.y
 
+  def transpose: GridBlock = copy(location = location.transpose)
+
+  def flipVertical(max: Int): GridBlock =
+    copy(location = location.copy(y = max - location.y))
+
   def withFloor(floorTile: Option[FloorTile]): GridBlock =
     copy(floor = floorTile)
   def withWall(wallTile: Option[WallTile]): GridBlock = copy(wall = wallTile)
-  def withPlaceable(placeableTile: Option[Placeable]): GridBlock =
-    copy(placeable = placeableTile)
+  def withPlaceable(placeableTile: Placeable): GridBlock =
+    copy(placeable = Option(placeableTile))
 
   def move(dx: Int = 0, dy: Int = 0, dz: Int = 0): GridBlock =
     copy(location = location.move(dx, dy, dz))

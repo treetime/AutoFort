@@ -1,4 +1,4 @@
-package autofort.model.map.floor
+package autofort.model.map
 
 import autofort.model.aesthetics.materials.Material
 

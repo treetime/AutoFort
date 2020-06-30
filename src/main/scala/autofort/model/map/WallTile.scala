@@ -1,7 +1,8 @@
-package autofort.model.map.wall
+package autofort.model.map
 
+import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
 import autofort.model.aesthetics.materials.Material
-import autofort.model.map.wall.WallTile.WallSymbol
+import autofort.model.map.WallTile.WallSymbol
 
 case class WallTile(material: Material, symbol: Option[WallSymbol])
 
@@ -20,12 +21,12 @@ object WallTile {
     WallSymbol('╝', Set(UP, LEFT))
   )
 
-  def getSymbol(connections: Set[Connection]): WallSymbol =
+  def getSymbol(connections: Set[Direction]): WallSymbol =
     wallSymbols
       .find(_.connections == connections)
       .getOrElse(unconnected(connections))
 
-  private def unconnected(connections: Set[Connection]): WallSymbol =
+  private def unconnected(connections: Set[Direction]): WallSymbol =
     WallSymbol('O', connections)
 
   // walls
@@ -34,15 +35,10 @@ object WallTile {
   case class Point(x: Int, y: Int, z: Int) {
     def move(dx: Int, dy: Int, dz: Int): Point =
       copy(x = x + dx, y = y + dy, z = z + dz)
+
+    def transpose: Point = copy(x = y, y = x)
   }
 
-  case class WallSymbol(symbol: Char, connections: Set[Connection])
+  case class WallSymbol(symbol: Char, connections: Set[Direction])
 
-  case object LEFT extends Connection
-
-  case object RIGHT extends Connection
-
-  case object UP extends Connection
-
-  case object DOWN extends Connection
 }

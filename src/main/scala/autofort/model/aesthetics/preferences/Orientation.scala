@@ -11,15 +11,6 @@ object Orientation extends Preferable[Orientation] {
   override def getChoices: Seq[Orientation] = Seq(HORIZONTAL, VERTICAL)
 }
 
-trait Shapeliness
-
-object Shapeliness extends Preferable[Shapeliness] {
-  case object FAT extends Shapeliness
-  case object THIN extends Shapeliness
-  case object SQUARE extends Shapeliness
-
-  override def getChoices: Seq[Shapeliness] = Seq(FAT, THIN, SQUARE)
-}
 
 trait Alignment
 

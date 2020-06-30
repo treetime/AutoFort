@@ -1,16 +1,13 @@
-package autofort.model.aesthetics.architecture.room.arrangement
+package autofort.model.aesthetics.architecture.room
 
-trait ArrangementGroup {
-
-}
+trait ArrangementGroup {}
 
 object ArrangementGroup {
 
+  sealed trait FillStrategy
 
   case class TableGroup() extends ArrangementGroup
 
-
-  sealed trait FillStrategy
   case class HalfFirst() extends FillStrategy
   case class Alternating() extends FillStrategy
   case class OppositeCorners() extends FillStrategy

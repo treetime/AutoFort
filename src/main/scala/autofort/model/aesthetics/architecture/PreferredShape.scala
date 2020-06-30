@@ -1,10 +1,7 @@
 package autofort.model.aesthetics.architecture
 import autofort.model.aesthetics.architecture.room.RoomDefinition
-import autofort.model.aesthetics.architecture.shape.{
-  AreaDefinition,
-  ShapeDefinition,
-  ShapePoint
-}
+import autofort.model.aesthetics.architecture.shape.{ShapeDefinition, ShapePoint}
+import autofort.model.map.AreaDefinition
 
 trait PreferredShape {
   val shape: ShapeDefinition

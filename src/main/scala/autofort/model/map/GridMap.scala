@@ -1,12 +1,8 @@
 package autofort.model.map
 
-import GridMap._
-import autofort.model.aesthetics.architecture.shape.AreaDefinition
-import autofort.model.placeables.Placeable
-import autofort.model.map.AreaMap.XYMap
-import autofort.model.aesthetics.materials.Material
+import autofort.model.map.GridMap._
 
-case class GridMap(levels: Vector[GridLevel]) extends AreaMap[GridBlock](levels)
+case class GridMap(levels: Vector[GridLevel])
 
 object GridMap {
 
@@ -32,11 +28,9 @@ object GridMap {
       .toVector
   )
 
+  case class GridLevel(override val xy: Vector[Vector[GridBlock]]) {
 
-  case class GridLevel(override val xy: Vector[Vector[GridBlock]])
-      extends XYMap[GridBlock](xy) {
-
-    override def get(x: Int, y: Int): Option[GridBlock] =
+    def get(x: Int, y: Int): Option[GridBlock] =
       for {
         row <- xy.find(p => p.headOption.exists(_.location.x == x))
         cell <- row.find(g => g.location.y == y)

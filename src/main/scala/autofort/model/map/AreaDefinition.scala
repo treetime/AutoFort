@@ -1,26 +1,18 @@
-package autofort.model.aesthetics.architecture.shape
+package autofort.model.map
 
-import autofort.model.aesthetics.architecture.room.TableArrangement.{
-  Detachable,
-  ExternalCorner,
-  InternalCorner,
-  Normal
-}
-import autofort.model.aesthetics.architecture.shape.AreaDefinition.{
-  CenterProfile,
-  PerimeterProfile,
-  SubSpaces
-}
-import autofort.model.aesthetics.preferences.Shapeliness
-import autofort.model.aesthetics.preferences.Shapeliness.{FAT, SQUARE, THIN}
-import autofort.model.map.GridBlock
+import autofort.model.aesthetics.architecture.room.TableArrangement.{Detachable, ExternalCorner, InternalCorner, Normal}
+import autofort.model.aesthetics.architecture.shape.ShapeDefinition
+import autofort.model.map.AreaDefinition.{CenterProfile, PerimeterProfile, SubSpaces}
 
-case class AreaDefinition(area: Set[GridBlock]) {
+class AreaDefinition(val area: Set[GridBlock]) {
 
   lazy val w: Int = dist(_.x)
   lazy val h: Int = dist(_.y)
-  lazy val shapeliness: Shapeliness =
-    if (w > h) FAT else if (w < h) THIN else SQUARE
+  lazy val xMax: Int = max(_.x)
+  lazy val yMax: Int = max(_.y)
+  lazy val xMin: Int = min(_.x)
+  lazy val yMin: Int = min(_.y)
+
   lazy val largestDimension: Int = Math.max(w, h)
   lazy val smallestDimension: Int = Math.min(w, h)
   lazy val (center, perimeter) =
@@ -39,7 +31,7 @@ case class AreaDefinition(area: Set[GridBlock]) {
 
   def -(that: GridBlock): AreaDefinition = {
     assert(area(that), "can't remove what it does not contain")
-    copy(area = area - that)
+    AreaDefinition(area - that)
   }
 
   def isSquare: Boolean =
@@ -77,12 +69,16 @@ case class AreaDefinition(area: Set[GridBlock]) {
 
   def -(that: AreaDefinition): AreaDefinition = {
     assert(this contains that, "can't remove what you don't have.")
-    copy(area = area diff that.area)
+    AreaDefinition(area diff that.area)
   }
 
   def contains(that: AreaDefinition): Boolean = that.area subsetOf this.area
 
   def isEmpty: Boolean = area.isEmpty
+
+  def min(f: GridBlock => Int): Int = f(area.minBy(f))
+
+  def max(f: GridBlock => Int): Int = f(area.maxBy(f))
 
   private def dist(f: GridBlock => Int) = f(area.maxBy(f)) - f(area.minBy(f))
 
@@ -119,6 +115,8 @@ case class AreaDefinition(area: Set[GridBlock]) {
     Option.when(blocks.subsetOf(area))(AreaDefinition(blocks))
   }
 
+  def move(x: Int, y: Int): AreaDefinition = new AreaDefinition(area.map(b => b.move(x,y)))
+
 }
 
 object AreaDefinition {
@@ -126,16 +124,19 @@ object AreaDefinition {
   def empty: AreaDefinition = AreaDefinition(Set.empty)
 
   /**
-   * Creates a room where the shortest side of the largest rectangle in the room is "scale"
-   * */
+    * Creates a room where the shortest side of the largest rectangle in the room is "scale"
+    * */
   def fromShape(shape: ShapeDefinition, scale: Int): AreaDefinition = {
     val scalingFactor = 100
     val bigArea = createAreaDefinition(shape, scalingFactor)
-    val scaledScale = Math.round(scale * (bigArea.smallestDimension / scalingFactor.toDouble)).toInt
+    val scaledScale = Math
+      .round(scale * (bigArea.smallestDimension / scalingFactor.toDouble))
+      .toInt
     createAreaDefinition(shape, scaledScale)
   }
 
-  private def createAreaDefinition(shape: ShapeDefinition, scale: Int): AreaDefinition = {
+  private def createAreaDefinition(shape: ShapeDefinition,
+                                   scale: Int): AreaDefinition = {
     val xMax = Math.round(shape.xMax * scale).toInt
     val yMax = Math.round(shape.yMax * scale).toInt
     val conditions = shape.asConditions(scale) //gives rules to determine whether a block is inside or outside the shape
@@ -145,6 +146,8 @@ object AreaDefinition {
     AreaDefinition(validBlocks)
   }
 
+  def apply(area: Set[GridBlock]) = new AreaDefinition(area)
+
   def blockField(xMax: Int, yMax: Int): Set[GridBlock] = {
     (0 until xMax).flatMap { px =>
       (0 until yMax).map { py =>
@@ -153,10 +156,9 @@ object AreaDefinition {
     }.toSet
   }
 
+  case class SubSpaces(rectangles: Map[Int, Set[GridBlock]]) {
 
-  case class SubSpaces(rectangles: Map[Int, Set[AreaDefinition]]) {
-
-  /*  def map(f: ((Int, AreaDefinition)) => (Int, AreaDefinition)): SubSpaces =
+    /*  def map(f: ((Int, AreaDefinition)) => (Int, AreaDefinition)): SubSpaces =
       copy(rectangles = rectangles.map((size, definitions) => size -> definitions.map(f)).toMap)*/
 
   }
@@ -189,7 +191,7 @@ object AreaDefinition {
     def apply(items: Set[AreaDefinition]): SubSpaces =
       new SubSpaces(items.groupBy(_.size))
 
-   // def scaleRoom(reference: SubSpaces) = ???
+    // def scaleRoom(reference: SubSpaces) = ???
 
   }
 
