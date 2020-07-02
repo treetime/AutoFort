@@ -67,6 +67,9 @@ case class GridBlock(location: Point = Point(0,0,0),
     abs(x - other.x) <= 1 && Math.abs(y - other.y) <= 1 && !((x == other.x) && (y == other.y))
   }
 
+  override def toString: String = {
+    wall.map(_.toString).orElse(placeable.map(_.toString)).orElse(floor.map(_.toString)).getOrElse(" ")
+  }
 }
 
 object GridBlock {

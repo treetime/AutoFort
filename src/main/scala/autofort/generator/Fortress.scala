@@ -25,10 +25,14 @@ object Fortress extends App {
 
   val conf = ArchitectureConfig(
     WithNoConcernForTheFuture(),
-    Rectangle(),
+    Rectangle(1),
     ConnectionConfig()
   )
 
-  println(new Shelter().generate(population, conf).toString)
+  val room = new Shelter().generate(population, conf)
 
+  println(room.toString)
+  println(room.size)
+  println(room.smallestDimension)
+  println(room.largestDimension)
 }

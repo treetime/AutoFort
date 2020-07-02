@@ -17,10 +17,10 @@ object PreferredShape {
   case class Rectangle(ratio: Double = 1) extends PreferredShape {
     assert(ratio != 0, "No lines, brah")
     val shape: ShapeDefinition = ShapeDefinition.fromPoints(
-      ShapePoint.ORIGIN,
-      ShapePoint(0, 1),
-      ShapePoint(1 / ratio, 1),
-      ShapePoint(1 / ratio, 0)
+      ShapePoint(0, 0),
+      ShapePoint(0, ratio),
+      ShapePoint(1, ratio),
+      ShapePoint(1, 0)
     )
   }
 

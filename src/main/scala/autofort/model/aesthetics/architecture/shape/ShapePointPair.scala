@@ -1,23 +1,26 @@
 package autofort.model.aesthetics.architecture.shape
 
-import autofort.model.aesthetics.architecture.shape.ShapeDefinition.{Condition, DOWN, Direction, LEFT, RIGHT, UP}
+import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
+import autofort.model.map.GridBlock
 
 case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
   def horizontal: Boolean = p1.y == p2.y
 
-  def function(scale: Int): Condition = {
-    if (!vertical) {
-      val gradient = (p2.y - p1.y) / (p2.x - p1.x)
-      val intercept = p1.y - p1.x * gradient
-      val function = (x: Int) =>
-        Math.round(scale * (gradient * x + intercept)).toInt
-      Condition(function, direction)
-
-    } else {
-      val function = (x: Int) => Math.round(scale * p1.y).toInt
-      Condition(function, direction)
-    }
+  def pairContains(block: GridBlock, scale: Int): Boolean = {
+    Option
+      .when(inBetween(_.x * scale, block.x)) {
+        val gradient = (p2.y - p1.y) / (p2.x - p1.x)
+        val intercept = p1.y - p1.x * gradient
+        val y = Math.round(scale * (gradient * block.x + intercept)).toInt
+        inBetween(_.y * scale, y)
+      }
+      .getOrElse(false)
   }
+
+  def inBetween(f: ShapePoint => Double, vOther: Double): Boolean = {
+    vOther >= Math.min(f(p1), f(p2)) && vOther <= Math.max(f(p1), f(p2))
+  }
+
 
   def vertical: Boolean = p1.x == p2.x
 

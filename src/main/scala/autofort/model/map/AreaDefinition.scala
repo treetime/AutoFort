@@ -1,20 +1,11 @@
 package autofort.model.map
 
-import autofort.model.aesthetics.architecture.room.{
-  Detachable,
-  ExternalCorner,
-  InternalCorner,
-  Normal
-}
-import autofort.model.aesthetics.architecture.shape.ShapeDefinition
+import autofort.model.aesthetics.architecture.room.{Detachable, ExternalCorner, InternalCorner, Normal}
+import autofort.model.aesthetics.architecture.shape.{ShapeDefinition, ShapePointPair}
 import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
 import autofort.model.aesthetics.preferences.Orientation
 import autofort.model.aesthetics.preferences.Orientation.{HORIZONTAL, VERTICAL}
-import autofort.model.map.AreaDefinition.{
-  CenterProfile,
-  PerimeterProfile,
-  SubSpaces
-}
+import autofort.model.map.AreaDefinition.{CenterProfile, PerimeterProfile, SubSpaces}
 
 class AreaDefinition(val area: Set[GridBlock]) {
 
@@ -247,9 +238,9 @@ object AreaDefinition {
                                    scale: Int): AreaDefinition = {
     val xMax = Math.round(shape.xMax * scale).toInt
     val yMax = Math.round(shape.yMax * scale).toInt
-    val conditions = shape.asConditions(scale) //gives rules to determine whether a block is inside or outside the shape
+    val pairs = shape.pairs //gives rules to determine whether a block is inside or outside the shape
     val validBlocks = blockField(xMax, yMax).filter { block =>
-      conditions.forall(_.holds(block.x, block.y))
+      pairs.exists(_.pairContains(block, scale))
     }
     AreaDefinition(validBlocks)
   }

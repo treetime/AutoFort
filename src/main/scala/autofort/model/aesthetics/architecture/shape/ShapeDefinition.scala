@@ -1,7 +1,6 @@
 package autofort.model.aesthetics.architecture.shape
 
 import autofort.model.aesthetics.architecture.shape.ShapeDefinition.{
-  Condition,
   DOWN,
   LEFT,
   RIGHT,
@@ -16,8 +15,6 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
   lazy val yMin: Double = shapePoints.map(_.y).max
   lazy val xMax: Double = shapePoints.map(_.x).max
   lazy val yMax: Double = shapePoints.map(_.y).max
-
-  def asConditions(scale: Int): Vector[Condition] = pairs.map(_.function(scale))
 
   def validateShape: Boolean = { // only allow closed shapes
     val grouped = pairs
@@ -56,6 +53,7 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
   )(func: ShapePoint => ShapePoint): ShapeDefinition = {
     copy(shapePoints = shapePoints.map(func))
   }
+
 }
 
 object ShapeDefinition {
@@ -66,21 +64,6 @@ object ShapeDefinition {
     new ShapeDefinition(points.toIndexedSeq)
 
   sealed trait Direction
-
-  /**
-    * Conditions define shape boundaries by providing rules for filtering blocks which aren't in the shape
-    * */
-  case class Condition(function: Int => Int, direction: Direction) {
-    def holds(x: Int, y: Int): Boolean = {
-      val result = function(x)
-      direction match {
-        case UP    => y >= result
-        case DOWN  => y <= result
-        case LEFT  => x <= result
-        case RIGHT => x >= result
-      }
-    }
-  }
 
   case object UP extends Direction
   case object DOWN extends Direction

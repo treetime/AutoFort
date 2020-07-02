@@ -13,11 +13,11 @@ case class AreaConfig(placementSpecs: Seq[PlaceableConfig]) {
     val room = RoomDefinition(
       architectureConfig.preferredShape.generateArea(scale)
     )
-    placementSpecs.foldLeft(room) {
+  /*  placementSpecs.foldLeft(room) {
       case (room, placementConfig) =>
         placementConfig.fill(room, population)
-    }
-
+    }*/
+    room
   }
 
 }
