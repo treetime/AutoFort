@@ -20,7 +20,7 @@ object PlacementGroup {
       AreaDefinition(
         (0 until x)
           .flatMap(px => {
-            (0 until y).map(py => GridBlock(px, py).withItem(item))
+            (0 until y).map(py => GridBlock(px, py, 0).withItem(item))
           })
           .toSet
       )

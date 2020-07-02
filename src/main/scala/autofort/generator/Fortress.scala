@@ -1,22 +1,34 @@
 package autofort.generator
 
-import autofort.model.map.GridMap
 import autofort.model.aesthetics.StyleGuide
+import autofort.model.aesthetics.architecture.PreferredShape.Rectangle
+import autofort.model.aesthetics.architecture.{
+  ArchitectureConfig,
+  ConnectionConfig,
+  WithNoConcernForTheFuture
+}
 import autofort.model.embark.Embark
-import autofort.model.fortress.FortressModel
-import autofort.model.fortress.fortress.FortressComponent
+import autofort.model.fortress.{FortressModel, Shelter}
+import autofort.model.map.GridMap
 
-trait Area
-
-class Fortress(embark: Embark, grid: GridMap, model: FortressModel, style: StyleGuide) {
+class Fortress(embark: Embark,
+               grid: GridMap,
+               model: FortressModel,
+               style: StyleGuide) {
   val population: Int = 0
 
 }
 
-object Fortress {
+object Fortress extends App {
 
-  val population = 0
+  val population = 100
 
+  val conf = ArchitectureConfig(
+    WithNoConcernForTheFuture(),
+    Rectangle(),
+    ConnectionConfig()
+  )
 
+  println(new Shelter().generate(population, conf).toString)
 
 }

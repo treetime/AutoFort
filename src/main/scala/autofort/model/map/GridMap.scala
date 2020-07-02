@@ -28,7 +28,7 @@ object GridMap {
       .toVector
   )
 
-  case class GridLevel(override val xy: Vector[Vector[GridBlock]]) {
+  case class GridLevel(xy: Vector[Vector[GridBlock]]) {
 
     def get(x: Int, y: Int): Option[GridBlock] =
       for {

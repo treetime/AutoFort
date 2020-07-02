@@ -1,17 +1,21 @@
 package autofort.model.aesthetics.architecture.room
 
-import autofort.model.aesthetics.architecture.room.ArrangementConfig.{CenterConfig, PerimeterConfig}
+import autofort.model.map.AreaDefinition
 
 //groups of what? spaced how? xx . xx . vs xxx .. xxx ..
 
-trait ArrangementConfig
+trait ArrangementConfig {
+
+  def fill(areaDefinition: AreaDefinition, spec: Double): AreaDefinition
+
+}
 
 object ArrangementConfig {
 
   trait CenterConfig extends ArrangementConfig
 
   trait PerimeterConfig extends ArrangementConfig
-
+  /*
   case class Rings() extends CenterConfig
 
   case class Rows(grouping: Int) extends CenterConfig
@@ -23,5 +27,6 @@ object ArrangementConfig {
   case class WallFill() extends PerimeterConfig
 
   case object EmptyPerimeter extends PerimeterConfig
+ */
 
 }

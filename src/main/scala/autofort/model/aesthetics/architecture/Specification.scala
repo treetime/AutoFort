@@ -1,7 +1,7 @@
 package autofort.model.aesthetics.architecture
 
 trait Specification {
-  def specify(population: Int): Int
+  def specify(population: Int): Double
 }
 
 object Specification {
@@ -24,14 +24,19 @@ object Specification {
   }
 
   case class MinMax(min: Int, max: Int) extends Specification {
-    def specify(population: Int): Int = {
+    def specify(population: Int): Double = {
       deltaDWARVES(population) * (max - min)
     }
   }
 
-  case class FillPercent(percent: Double) extends Specification {
-    def specify(area: Int): Int = {
-      Math.round(min + Math.max(ratio * area - 4, 0)).toInt
+  case class FillPercent(minPercent: Double, maxPercent: Double)
+      extends Specification {
+    def specify(population: Int): Double = {
+      Math
+        .round(
+          minPercent + Math
+            .max(deltaDWARVES(population) * (maxPercent - minPercent), 0)
+        )
     }
   }
 }

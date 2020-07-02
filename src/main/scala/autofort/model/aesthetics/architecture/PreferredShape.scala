@@ -5,7 +5,6 @@ import autofort.model.map.AreaDefinition
 
 trait PreferredShape {
   val shape: ShapeDefinition
-  val scale: Int //side length of the shortest side of the shape in blocks
 
   def generateArea(scale: Int): AreaDefinition = {
     AreaDefinition.fromShape(shape, scale)
@@ -15,7 +14,7 @@ trait PreferredShape {
 object PreferredShape {
   import Math._
 
-  case class Rectangle(scale: Int, ratio: Double) extends PreferredShape {
+  case class Rectangle(ratio: Double = 1) extends PreferredShape {
     assert(ratio != 0, "No lines, brah")
     val shape: ShapeDefinition = ShapeDefinition.fromPoints(
       ShapePoint.ORIGIN,

@@ -1,6 +1,6 @@
 package autofort.model.items
 
-case class Item(symbol: Char) {
+class Item(symbol: Char) {
 
   override def toString: String = symbol.toString
 

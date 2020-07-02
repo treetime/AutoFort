@@ -2,13 +2,13 @@ package autofort.model.map
 
 import java.lang.Math.{abs, pow, sqrt}
 
-import autofort.model.aesthetics.architecture.room.{Detachable, ExternalCorner, InternalCorner, Normal, PerimeterBlockType}
-import autofort.model.aesthetics.architecture.room.TableArrangement._
+import autofort.model.aesthetics.architecture.room._
+import autofort.model.aesthetics.materials.Stone.Granite
 import autofort.model.items.Item
 import autofort.model.map.WallTile.Point
 
-case class GridBlock(location: Point,
-                     floor: Option[FloorTile] = None,
+case class GridBlock(location: Point = Point(0,0,0),
+                     floor: Option[FloorTile] = Some(FloorTile(Granite())),
                      wall: Option[WallTile] = None,
                      placeable: Option[Item] = None) {
   lazy val r: Double = sqrt(pow(x, 2) + pow(y, 2))
@@ -70,7 +70,7 @@ case class GridBlock(location: Point,
 }
 
 object GridBlock {
-  def apply(x: Int = 0, y: Int = 0, z: Int = 0): GridBlock =
-    new GridBlock(Point(x, y, z))
+
+  def apply(x: Int, y: Int, z: Int): GridBlock = GridBlock(Point(x,y, z))
 
 }

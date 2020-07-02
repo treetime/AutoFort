@@ -1,13 +1,6 @@
 package autofort.model.aesthetics.architecture.shape
 
-import autofort.model.aesthetics.architecture.shape.ShapeDefinition.{
-  Condition,
-  DOWN,
-  Direction,
-  LEFT,
-  RIGHT,
-  UP
-}
+import autofort.model.aesthetics.architecture.shape.ShapeDefinition.{Condition, DOWN, Direction, LEFT, RIGHT, UP}
 
 case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
   def horizontal: Boolean = p1.y == p2.y
@@ -28,11 +21,11 @@ case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
 
   def vertical: Boolean = p1.x == p2.x
 
-  def direction: Direction = (p1.x, p2.x, p1.y, p1.y) match {
+  def direction: Direction = (p1.x, p2.x, p1.y, p2.y) match {
     case (x1, x2, _, _) if x2 > x1 => DOWN
     case (x1, x2, _, _) if x1 > x2 => UP
-    case (_, _, y1, y2) if y1 > y2 => LEFT
-    case (_, _, y1, y2) if y1 < y2 => RIGHT
+    case (_, _, y1, y2) if y2 > y1 => LEFT
+    case (_, _, y1, y2) if y1 > y2 => RIGHT
     case other =>
       throw new RuntimeException(
         s"cant have the exact same two points: ($p1, $p2)"
