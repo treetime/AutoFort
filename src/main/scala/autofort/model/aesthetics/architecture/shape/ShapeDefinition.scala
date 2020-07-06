@@ -28,7 +28,7 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
     grouped(LEFT) == grouped(RIGHT)
   }
 
-  def pairs: Vector[ShapePointPair] = {
+  lazy val pairs: Vector[ShapePointPair] = {
     for {
       last <- shapePoints.lastOption
       first <- shapePoints.headOption

@@ -1,12 +1,6 @@
 package autofort.model.map
 
-import autofort.model.aesthetics.architecture.room.{Detachable, ExternalCorner, InternalCorner, Normal}
-import autofort.model.aesthetics.architecture.shape.{ShapeDefinition, ShapePointPair}
-import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
-import autofort.model.aesthetics.preferences.Orientation
-import autofort.model.aesthetics.preferences.Orientation.{HORIZONTAL, VERTICAL}
-import autofort.model.map.AreaDefinition.{CenterProfile, PerimeterProfile, SubSpaces}
-
+/*
 class AreaDefinition(val area: Set[GridBlock]) {
 
   lazy val w: Int = dist(_.x)
@@ -53,15 +47,12 @@ class AreaDefinition(val area: Set[GridBlock]) {
 
   def contains(block: GridBlock): Boolean = area(block)
 
-  def isContinuous: Boolean = {
-    perimeter.area.forall(b => b.countNeighborsIn(perimeter) >= 2)
-  }
 
   def subSpaces: SubSpaces = {
     @scala.annotation.tailrec
     def breakIntoComponents(
-      source: AreaDefinition = this,
-      components: Set[AreaDefinition] = Set.empty
+                             source: AreaDefinition = this,
+                             components: Set[AreaDefinition] = Set.empty
     ): Set[AreaDefinition] = {
       if (source.isEmpty) {
         components
@@ -75,10 +66,6 @@ class AreaDefinition(val area: Set[GridBlock]) {
     SubSpaces(breakIntoComponents())
   }
 
-  def -(that: AreaDefinition): AreaDefinition = {
-    assert(this contains that, "can't remove what you don't have.")
-    AreaDefinition(area diff that.area)
-  }
 
   def contains(that: AreaDefinition): Boolean = that.area subsetOf this.area
 
@@ -88,81 +75,26 @@ class AreaDefinition(val area: Set[GridBlock]) {
 
   def max(f: GridBlock => Int): Int = f(area.maxBy(f))
 
-  def attachTo(other: AreaDefinition,
-               direction: Direction = RIGHT): AreaDefinition =
-    direction match {
-      case UP    => new AreaDefinition(zeroAt(other.xMin, other.yMax))
-      case RIGHT => new AreaDefinition(zeroAt(other.xMax, other.yMin))
-      case LEFT  => other.attachTo(this, RIGHT)
-      case DOWN  => other.attachTo(this, UP)
-    }
 
-  def zeroAt(x: Int, y: Int): Set[GridBlock] = {
-    area.map(_.move(x - min(_.x), y - min(_.y)))
-  }
 
-  def rotate(direction: Direction): AreaDefinition = direction match {
-    case LEFT  => flipXY.flipVertical
-    case RIGHT => flipXY.flipHorizontal
-    case DOWN  => flipVertical.flipHorizontal
-    case UP    => flipVertical.flipHorizontal
-  }
 
-  def flipVertical: AreaDefinition =
-    new AreaDefinition(area.map(_.flipVertical(yMax).move(0, -yMax)))
 
-  def flipHorizontal: AreaDefinition =
-    new AreaDefinition(area.map(_.flipHorizontal(xMax).move(-xMax, 0)))
 
-  def flipXY: AreaDefinition = new AreaDefinition(area.map(_.transpose))
 
-  def withBlock(block: GridBlock): AreaDefinition =
-    new AreaDefinition(area + block)
-
-  def replaceStartingLeftTop(other: AreaDefinition): Set[GridBlock] = {
-    val dx = leftTop.x - other.leftTop.x
-    val dy = leftTop.y - other.leftTop.y
-    replaceWith(other.move(dx, dy))
-  }
-
-  def leftTop: GridBlock = area.minBy(_.r)
-
-  def replaceWith(other: AreaDefinition): Set[GridBlock] = {
-    area.map { b =>
-      other.area.find(_.location == b.location) match {
-        case Some(block) => block
-        case _           => b
-      }
-    }
-  }
 
   def shrinkHorizontallyTo(fraction: Double): AreaDefinition = {
     val bracket = Math.round(w * (1 - fraction) / 2).toInt
     AreaDefinition(area.filter(b => b.x >= bracket && b.x <= w - bracket))
   }
 
-  override def toString: String = {
-    (0 until h)
-      .map { py =>
-        (0 until w)
-          .map { px =>
-            area
-              .find(b => b.x == px && b.y == py)
-              .map(_.toString)
-              .getOrElse(" ")
-          }
-          .mkString("")
-      }
-      .mkString("\n")
-  }
+
 
   def getSurroundingBlocks: AreaDefinition = {
     val offset = move(1, 1)
     AreaDefinition(AreaDefinition.blockField(w + 2, h + 2).filterNot(area))
   }
 
-  def move(x: Int, y: Int): AreaDefinition =
-    new AreaDefinition(area.map(b => b.move(x, y)))
+
 
   private def dist(f: GridBlock => Int) =
     if (area.nonEmpty) {
@@ -176,18 +108,32 @@ class AreaDefinition(val area: Set[GridBlock]) {
     def findLargest(
       block: GridBlock,
       x: Int = 1,
-      y: Int = 1,
+      y: Int = 0,
       currentLargest: AreaDefinition = AreaDefinition.empty
     ): AreaDefinition = {
-      getRectangle(block, x, y) match {
-        case Some(thing) if thing > currentLargest =>
-          findLargest(block, x + 1, y, thing)
-        case None =>
-          if (x == 1) currentLargest else findLargest(block, 1, y + 1)
-        case _ => findLargest(block, x + 1, y, currentLargest)
+      if (x > xMin + w) {
+        findLargest(block, 1, y + 1)
+      } else if (y > yMin + h) {
+        currentLargest
+      } else {
+        getRectangle(block, x, y) match {
+          case Some(thing) =>
+            findLargest(
+              block,
+              x + 1,
+              y,
+              if (thing > currentLargest) thing else currentLargest
+            )
+          case None => findLargest(block, 1, y + 1)
+        }
       }
     }
     findLargest(block)
+
+    area.map{block =>
+      findLargest(block)
+    }.maxBy(_.size)
+
   }
 
   def >(that: AreaDefinition): Boolean =
@@ -222,16 +168,16 @@ object AreaDefinition {
 
   def empty: AreaDefinition = AreaDefinition(Set.empty)
 
+  def apply(area: Set[GridBlock] = Set.empty) = new AreaDefinition(area)
+
   /**
     * Creates a room where the shortest side of the largest rectangle in the room is "scale"
     * */
   def fromShape(shape: ShapeDefinition, scale: Int): AreaDefinition = {
-    val scalingFactor = 100
-    val bigArea = createAreaDefinition(shape, scalingFactor)
-    val scaledScale = Math
-      .round(scale * (bigArea.smallestDimension / scalingFactor.toDouble))
-      .toInt
-    createAreaDefinition(shape, scaledScale)
+    val bigScale = 10
+    val reference = createAreaDefinition(shape, bigScale)
+    val areaScale = scale * reference.largestRectangle.smallestDimension / bigScale.toDouble
+    createAreaDefinition(shape, areaScale.toInt)
   }
 
   private def createAreaDefinition(shape: ShapeDefinition,
@@ -245,7 +191,6 @@ object AreaDefinition {
     AreaDefinition(validBlocks)
   }
 
-  def apply(area: Set[GridBlock] = Set.empty) = new AreaDefinition(area)
 
   def blockField(xMax: Int, yMax: Int): Set[GridBlock] = {
     (0 until xMax).flatMap { px =>
@@ -255,46 +200,8 @@ object AreaDefinition {
     }.toSet
   }
 
-  case class SubSpaces(rectangles: Map[Int, Set[AreaDefinition]]) {
 
-    def orderedList: IndexedSeq[(Int, Set[AreaDefinition])] =
-      rectangles.toIndexedSeq.sortBy(_._1)
 
-    /*  def map(f: ((Int, AreaDefinition)) => (Int, AreaDefinition)): SubSpaces =
-      copy(rectangles = rectangles.map((size, definitions) => size -> definitions.map(f)).toMap)*/
-
-  }
-
-  case class PerimeterProfile(internal: Set[GridBlock],
-                              external: Set[GridBlock],
-                              detachable: Set[GridBlock],
-                              lineSpaces: SubSpaces)
-
-  case class CenterProfile(centerSpaces: SubSpaces)
-
-  object PerimeterProfile {
-
-    def fromAreaDefinition(areaDefinition: AreaDefinition): PerimeterProfile = {
-      val profile = areaDefinition.perimeter.area
-        .groupBy(_.classifyIn(areaDefinition))
-        .withDefault(_ => Set.empty[GridBlock])
-
-      PerimeterProfile(
-        profile(InternalCorner),
-        profile(ExternalCorner),
-        profile(Detachable),
-        AreaDefinition(profile(Normal)).subSpaces
-      )
-    }
-  }
-
-  object SubSpaces {
-
-    def apply(items: Set[AreaDefinition]): SubSpaces =
-      new SubSpaces(items.groupBy(_.size))
-
-    // def scaleRoom(reference: SubSpaces) = ???
-
-  }
 
 }
+*/

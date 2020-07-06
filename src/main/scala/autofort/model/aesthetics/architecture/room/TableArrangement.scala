@@ -9,10 +9,9 @@ import autofort.model.aesthetics.preferences.Orientation.{HORIZONTAL, VERTICAL}
 import autofort.model.aesthetics.preferences.{Alignment, Orientation}
 import autofort.model.items.Item.{Table, Throne}
 import autofort.model.items.PlacementGroup
-import autofort.model.map.AreaDefinition
 
 trait TableArrangement extends ArrangementConfig {
-  def fill(area: AreaDefinition, spec: Double): AreaDefinition
+  def fill(area: RectangularArea, spec: Double): RectangularArea
 }
 
 object TableArrangement {
@@ -45,12 +44,10 @@ object TableArrangement {
 //  case class FixedSpacing(width: Int) extends CenterFillingStrategy*/
   case class Lines(alignment: Alignment) extends CenterFillingStrategy {
 
-    def fill(area: AreaDefinition, fill: Double): AreaDefinition = { //@todo should be room def
-      val quantity = Math.round(area.size * fill / 2).toInt
-      val subArea = fill * area.size
-      val fillArea = area.shrinkHorizontallyTo(fill)
-      val items = DiningGroup(fillArea.w, fillArea.h > 4, HORIZONTAL)
-      AreaDefinition(area.replaceStartingLeftTop(items.area))
+    def fill(area: RectangularArea, fill: Double): RectangularArea = {
+      val fillArea = area.scaleTo(fill)
+      val items = DiningGroup(fillArea.width, fillArea.height > 4, HORIZONTAL)
+      RectangularArea(area.replaceStartingLeftTop(items.area))
     }
 
   }

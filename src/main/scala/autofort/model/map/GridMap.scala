@@ -32,8 +32,8 @@ object GridMap {
 
     def get(x: Int, y: Int): Option[GridBlock] =
       for {
-        row <- xy.find(p => p.headOption.exists(_.location.x == x))
-        cell <- row.find(g => g.location.y == y)
+        row <- xy.find(p => p.headOption.exists(_.x == x))
+        cell <- row.find(g => g.y == y)
       } yield cell
 
     //second argument is the incoming level

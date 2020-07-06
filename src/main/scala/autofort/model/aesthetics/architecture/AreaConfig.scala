@@ -9,15 +9,8 @@ case class AreaConfig(placementSpecs: Seq[PlaceableConfig]) {
 
   def generateRoom(architectureConfig: ArchitectureConfig,
                    population: Int): RoomDefinition = {
-    val scale: Int = Math.sqrt(population).toInt
-    val room = RoomDefinition(
-      architectureConfig.preferredShape.generateArea(scale)
-    )
-  /*  placementSpecs.foldLeft(room) {
-      case (room, placementConfig) =>
-        placementConfig.fill(room, population)
-    }*/
-    room
+    val scale: Int = Math.round(3 + 100 * (population - 7) / 193.9).toInt
+    architectureConfig.preferredShape.generateArea(scale)
   }
 
 }

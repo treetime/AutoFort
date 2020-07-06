@@ -1,13 +1,15 @@
 package autofort.model.aesthetics.architecture
 import autofort.model.aesthetics.architecture.room.RoomDefinition
-import autofort.model.aesthetics.architecture.shape.{ShapeDefinition, ShapePoint}
-import autofort.model.map.AreaDefinition
+import autofort.model.aesthetics.architecture.shape.{
+  ShapeDefinition,
+  ShapePoint
+}
 
 trait PreferredShape {
   val shape: ShapeDefinition
 
-  def generateArea(scale: Int): AreaDefinition = {
-    AreaDefinition.fromShape(shape, scale)
+  def generateArea(scale: Int): RoomDefinition = {
+    RoomDefinition.fromShape(shape, scale)
   }
 }
 

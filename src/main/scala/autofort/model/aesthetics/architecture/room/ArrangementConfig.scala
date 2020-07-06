@@ -1,12 +1,10 @@
 package autofort.model.aesthetics.architecture.room
 
-import autofort.model.map.AreaDefinition
-
 //groups of what? spaced how? xx . xx . vs xxx .. xxx ..
 
 trait ArrangementConfig {
 
-  def fill(areaDefinition: AreaDefinition, spec: Double): AreaDefinition
+  def fill(areaDefinition: RectangularArea, spec: Double): RectangularArea
 
 }
 

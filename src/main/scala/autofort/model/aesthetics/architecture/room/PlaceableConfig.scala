@@ -1,7 +1,6 @@
 package autofort.model.aesthetics.architecture.room
 
 import autofort.model.aesthetics.architecture.Specification
-import autofort.model.map.AreaDefinition
 
 abstract class PlaceableConfig(val arrange: ArrangementConfig,
                                val specification: Specification) {
@@ -19,16 +18,18 @@ object PlaceableConfig {
                            override val specification: Specification)
       extends PlaceableConfig(plan, specification) {
 
-    def fill(roomDefinition: RoomDefinition, spec: Double): RoomDefinition = {
-      roomDefinition.area.center.subSpaces.rectangles.foldLeft(roomDefinition) {
-        case (room, (size, areas)) =>
-          areas.foldLeft(room) {
-            case (r, fillArea) =>
-              RoomDefinition(
-                AreaDefinition(r.area.replaceWith(plan.fill(fillArea, spec)))
-              )
-          }
-      }
+    def fill(room: RoomDefinition, spec: Double): RoomDefinition = {
+      val filledAreas = room.area.subSpaces.rectangularAreas
+        .map(area => plan.fill(area, spec))
+      RoomDefinition(new AreaDefinition(filledAreas.foldLeft(room.area.blocks) {
+        case (blocks, rect) =>
+          blocks.toSeq.map { block =>
+            rect.blocks.find(block.areaCompare) match {
+              case Some(friend) => friend
+              case None         => block
+            }
+          }.toSet
+      }))
     }
 
   }

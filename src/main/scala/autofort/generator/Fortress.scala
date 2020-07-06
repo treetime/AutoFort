@@ -21,18 +21,16 @@ class Fortress(embark: Embark,
 
 object Fortress extends App {
 
-  val population = 100
+  val population = 30
 
   val conf = ArchitectureConfig(
     WithNoConcernForTheFuture(),
-    Rectangle(1),
+    Rectangle(0.5),
     ConnectionConfig()
   )
 
   val room = new Shelter().generate(population, conf)
 
   println(room.toString)
-  println(room.size)
-  println(room.smallestDimension)
-  println(room.largestDimension)
+
 }

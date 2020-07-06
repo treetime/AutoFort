@@ -32,13 +32,6 @@ object WallTile {
   // walls
   trait Connection
 
-  case class Point(x: Int, y: Int, z: Int) {
-    def move(dx: Int, dy: Int, dz: Int): Point =
-      copy(x = x + dx, y = y + dy, z = z + dz)
-
-    def transpose: Point = copy(x = y, y = x)
-  }
-
   case class WallSymbol(symbol: Char, connections: Set[Direction])
 
 }
