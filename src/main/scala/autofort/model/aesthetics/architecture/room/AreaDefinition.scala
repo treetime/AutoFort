@@ -11,7 +11,7 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
   lazy val height: Int = yMax - yMin
   lazy val (maxDimension: Int, minDimension: Int) =
     if (width > height) (width, height) else (height, width)
-  lazy val area: Int = width * height
+  lazy val area: Int = blocks.size
   lazy val xMin: Int = xBlocks.minOption.getOrElse(0)
   lazy val xMax: Int = xBlocks.maxOption.getOrElse(0)
   lazy val yMin: Int = yBlocks.minOption.getOrElse(0)
@@ -92,14 +92,14 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
   }
 
   override def toString: String = {
-    (0 until height)
+    (0 to yMax)
       .map { py =>
-        (0 until width)
+        (0 to xMax)
           .map { px =>
-            blocks
-              .find(b => b.x == px && b.y == py)
-              .map(_.toString)
-              .getOrElse(" ")
+            blocks.find(_.areaCompare(GridBlock(px, py, 0))) match {
+              case Some(friend) => friend.toString
+              case None         => "x"
+            }
           }
           .mkString("")
       }

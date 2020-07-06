@@ -26,24 +26,37 @@ object PreferredShape {
     )
   }
 
-  case class nGon(scale: Int, n: Int) extends PreferredShape {
+  case class nGon(n: Int) extends PreferredShape {
     assert(n >= 3, "No two-angles, onetagons or nonetagons in this dimension")
-    val shape: ShapeDefinition = {
+    /*private val inc: Double = 2 * Math.PI / n.toDouble
+    private val offs: Double = - Math.PI / 2
+
+    val shape: ShapeDefinition = ShapeDefinition.fromPoints(
+      (0 until n).map(
+        i =>
+          ShapePoint(
+            Math.round(10 * cos(offs + i * inc)) / 10.0,
+            Math.round(10 * sin(offs + i * inc)) / 10.0
+        )
+      ): _*
+    )*/
+
+        val shape: ShapeDefinition = {
       var i = 0
       var angle: Double = 0
       var inc: Double = 2 * Math.PI / n.toDouble //exterior angle
       var shapePoints: Seq[ShapePoint] = Seq(ShapePoint(0, 0))
-      while (i < n) {
+      while (i < n - 1) {
         shapePoints.lastOption.foreach { prev =>
           angle = angle + inc
           shapePoints = shapePoints :+ ShapePoint(
-            prev.x + cos(angle),
-            prev.y + sin(angle)
+            round((prev.x + cos(angle)) * 10.0) / 10.0,
+            round((prev.y + sin(angle)) * 10.0) / 10.0,
           )
         }
         i = i + 1
       }
-      ShapeDefinition(shapePoints.toVector)
+      ShapeDefinition.fromPoints(shapePoints:_*)
     }
   }
 }

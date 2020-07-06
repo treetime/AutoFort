@@ -32,7 +32,7 @@ object SubSpaces {
       }
     }
 
-    area.blocks.toSeq
+    area.blocks.toVector
       .sortBy(_.y)
       .sortBy(_.x)
       .map(b => findForCoordinate(b.x, b.y))
