@@ -1,7 +1,7 @@
 package autofort.model.aesthetics.architecture.room
 
 import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
-import autofort.model.map.GridBlock
+import autofort.model.map.{GridBlock, WallTile}
 
 class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
 
@@ -48,6 +48,11 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
   }
 
   def contains(b: GridBlock): Boolean = blocks(b)
+
+  def containsArea(area: AreaDefinition): Boolean =
+    area.blocks.forall(areaContains)
+
+  def areaContains(b: GridBlock): Boolean = blocks.exists(_.areaCompare(b))
 
   def isContinuous: Boolean = {
     perimeter.blocks.forall(b => b.countNeighborsIn(perimeter) >= 2)
@@ -101,10 +106,32 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
               case None         => "x"
             }
           }
-          .mkString("")
+          .mkString("") + s" $py"
       }
       .mkString("\n")
   }
+
+  def withWalls(): AreaDefinition = {
+    val offsetSet = move(1, 1)
+    val walls = (yMin to yMax + 2).flatMap { py =>
+      (xMin to xMax + 2).flatMap { px =>
+        val block = GridBlock(px, py)
+        Option.when(!offsetSet.areaContains(block) && offsetSet.touches(block))(block) //cardinal neighbors
+      }
+    }
+
+    val wallBlocks =
+    walls.foldLeft(Seq.empty[GridBlock]) {
+      case (acc, elem) =>
+        val direction = walls.flatMap(_.cardinalDirection(elem)).toSet
+      acc :+ elem.withWall(Option(WallTile.fromConnections(direction)))
+    }
+
+    new AreaDefinition(offsetSet.blocks ++ wallBlocks)
+
+  }
+
+  def touches(b: GridBlock): Boolean = blocks.exists(_.touches(b))
 
   private def isCenter(b: GridBlock): Boolean = {
     getNeighbors(b).size == 8

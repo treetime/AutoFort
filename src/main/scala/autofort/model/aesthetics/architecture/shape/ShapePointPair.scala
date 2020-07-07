@@ -11,23 +11,24 @@ import autofort.model.map.GridBlock
 
 case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
   def horizontal: Boolean = p1.y == p2.y
+  def vertical: Boolean = p1.x == p2.x
 
   def intersects(block: GridBlock): Intersection = {
     val (yMax, yMin) = if (p1.y > p2.y) (p1.y, p2.y) else (p2.y, p1.y)
     if (block.y < yMax && block.y >= yMin) {
       val (pMax, pMin) = if (p1.x > p2.x) (p1, p2) else (p2, p1)
-      if (pMax.x == pMin.x) {
-        if (block.x == pMax.x) ON_LINE
-        else if (block.x < pMin.x) CUTS_LINE
+      if (vertical) {
+        if (block.x == Math.round(pMax.x).toInt) ON_LINE
+        else if (block.x < Math.floor(pMin.x)) CUTS_LINE
         else NO_TOUCH
-      } else if (p1.y == p2.y) {
-        if (block.x < pMin.x) CUTS_LINE
-        else if (block.x >= pMin.x && block.x < pMax.x) ON_LINE
+      } else if (horizontal) {
+        if (block.x >= Math.floor(pMin.x) && block.x < Math.ceil(pMax.x)) ON_LINE
+        else if (block.x < Math.floor(pMin.x) || block.x > Math.ceil(pMax.x)) CUTS_LINE
         else NO_TOUCH
       } else {
         val gradient = (pMax.y - pMin.y) / (pMax.x - pMin.x)
         val intercept = pMin.y - pMin.x * gradient
-        val x = (block.y - intercept) / gradient
+        val x = Math.round((block.y - intercept) / gradient)
         if (x == block.x) {
           ON_LINE
         } else if (block.x < x) {
@@ -45,8 +46,6 @@ case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
     vOther >= Math.min(f(p1), f(p2)) && vOther <= Math.max(f(p1), f(p2))
   }
 
-  def vertical: Boolean = p1.x == p2.x
-
   def direction: Direction = (p1.x, p2.x, p1.y, p2.y) match {
     case (x1, x2, _, _) if x2 > x1 => DOWN
     case (x1, x2, _, _) if x1 > x2 => UP
@@ -60,8 +59,8 @@ case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
 
   def scaled(scale: Double): ShapePointPair =
     copy(
-      p1 = p1.copy(p1.x * scale, p1.y * scale),
-      p2 = p2.copy(p2.x * scale, p2.y * scale)
+      p1 = p1.copy(Math.round(p1.x * scale), Math.round(p1.y * scale)),
+      p2 = p2.copy(Math.round(p2.x * scale), Math.round(p2.y * scale))
     )
 }
 

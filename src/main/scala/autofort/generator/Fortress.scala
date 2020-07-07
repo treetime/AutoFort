@@ -18,10 +18,10 @@ class Fortress(embark: Embark,
 
 object Fortress extends App {
 
-  val population = 100
+  val population = 150
 
   val conf =
-    ArchitectureConfig(WithNoConcernForTheFuture(), nGon(8), ConnectionConfig())
+    ArchitectureConfig(WithNoConcernForTheFuture(), nGon(3), ConnectionConfig())
 
   val room = new Shelter().generate(population, conf)
 

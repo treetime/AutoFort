@@ -3,6 +3,7 @@ package autofort.model.map
 import java.lang.Math.{abs, pow, sqrt}
 
 import autofort.model.aesthetics.architecture.room._
+import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
 import autofort.model.aesthetics.materials.Stone.Granite
 import autofort.model.items.Item
 
@@ -66,7 +67,19 @@ case class GridBlock(x: Int = 0,
   }
 
   def touches(other: GridBlock): Boolean = {
-    abs(x - other.x) <= 1 && Math.abs(y - other.y) <= 1 && !((x == other.x) && (y == other.y))
+    val xDist = x - other.x
+    val yDist = y - other.y
+    abs(xDist) <= 1 && Math.abs(yDist) <= 1 && !areaCompare(other)
+  }
+
+  def cardinalDirection(other: GridBlock): Option[Direction] = {
+    (x - other.x, y - other.y) match {
+      case (-1, 0) => Option(LEFT)
+      case (1, 0)  => Option(RIGHT)
+      case (0, -1) => Option(UP)
+      case (0, 1) => Option(DOWN)
+      case _       => None
+    }
   }
 
   def withFloorTile(floorTile: Option[FloorTile]): GridBlock =

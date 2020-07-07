@@ -9,7 +9,8 @@ import autofort.model.map.GridBlock
 
 case class RoomDefinition(area: AreaDefinition) {
 
-  override def toString: String = area.toString
+  override def toString: String = area.withWalls().toString
+
 
 }
 
@@ -27,7 +28,7 @@ object RoomDefinition {
         .area
         .toDouble
     ) / bigScale.toDouble*/
-    RoomDefinition(createAreaDefinition(shape, 25))
+    RoomDefinition(createAreaDefinition(shape, scale))
   }
 
   private def createAreaDefinition(shape: ShapeDefinition,

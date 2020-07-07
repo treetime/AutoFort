@@ -50,8 +50,8 @@ object PreferredShape {
         shapePoints.lastOption.foreach { prev =>
           angle = angle + inc
           shapePoints = shapePoints :+ ShapePoint(
-            round((prev.x + cos(angle)) * 10.0) / 10.0,
-            round((prev.y + sin(angle)) * 10.0) / 10.0,
+            round((prev.x + cos(angle)) * 100.0) / 100.0,
+            round((prev.y + sin(angle)) * 100.0) / 100.0,
           )
         }
         i = i + 1

@@ -74,7 +74,7 @@ object ShapeDefinition {
 
     val impliedArea = xSize * ySize
 
-    val ratio = 1 / Math.sqrt(impliedArea)
+    val ratio = Math.sqrt(1.0 / impliedArea)
 
     val shape = new ShapeDefinition(
       points
