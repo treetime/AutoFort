@@ -2,8 +2,15 @@ package autofort.generator
 
 import autofort.model.aesthetics.StyleGuide
 import autofort.model.aesthetics.architecture.PreferredShape.nGon
-import autofort.model.aesthetics.architecture.room.AreaDefinition
-import autofort.model.aesthetics.architecture.{ArchitectureConfig, ConnectionConfig, WithNoConcernForTheFuture}
+import autofort.model.aesthetics.architecture.room.{
+  AreaDefinition,
+  RoomDefinition
+}
+import autofort.model.aesthetics.architecture.{
+  ArchitectureConfig,
+  ConnectionConfig,
+  WithNoConcernForTheFuture
+}
 import autofort.model.embark.Embark
 import autofort.model.fortress.{FortressModel, Shelter}
 import autofort.model.map.{GridBlock, GridMap}
@@ -18,27 +25,32 @@ class Fortress(embark: Embark,
 
 object Fortress extends App {
 
-  val population = 150
+  val population = 30
 
   val conf =
-    ArchitectureConfig(WithNoConcernForTheFuture(), nGon(3), ConnectionConfig())
+    ArchitectureConfig(WithNoConcernForTheFuture(), nGon(4), ConnectionConfig())
 
   val room = new Shelter().generate(population, conf)
 
   println(room.toString)
-  println(
-    s"${room.area.width} x ${room.area.height} = ${room.area.area}"
-  )
-/*import Math._
-  val area = new AreaDefinition(
-  (0 until 26).flatMap{py =>
-    (0 until 26).map{px =>
-     val block = GridBlock(px, py)
-     if(pow(12,2) < pow(block.x - 12,2) + pow(block.y - 12,2)) block else block.withFloorTile(None)
-    }
-  }.toSet
-  )
+  println(s"${room.area.width} x ${room.area.height} = ${room.area.area}")
 
-  println(area.toString)*/
+/*  val subSpaces = room.area.subSpaces
+
+  subSpaces.rectangularAreas.foreach(x => println(x))*/
+/*
+  import Math._
+
+  val area = new AreaDefinition((0 to 26).flatMap { py =>
+    (0 to 26).flatMap { px =>
+      val block = GridBlock(px, py)
+      Option
+        .when(pow(13, 2) >= pow(block.x - 13, 2) + pow(block.y - 13, 2))(block)
+    }
+  }.toSet)
+
+  println(RoomDefinition(area).toString)
+  println(s"${area.width} x ${area.height} = ${area.area}")
+*/
 
 }

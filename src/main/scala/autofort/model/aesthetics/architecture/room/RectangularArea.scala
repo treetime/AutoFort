@@ -22,7 +22,7 @@ case class RectangularArea(override val blocks: Set[GridBlock])
     copy(blocks.map(_.move(dx, dy)))
 
   def subsetOf(area: AreaDefinition): Boolean = {
-    blocks.subsetOf(area.blocks)
+    area.containsArea(this)
   }
 
 

@@ -90,8 +90,8 @@ object ShapeDefinition {
 
     )
 
-    shape.pairs.map(_.scaled(10)).foreach({ x =>
-      println(s"${x.p1.x}, ${x.p1.y} --- ${x.p2.x}, ${x.p2.y}");
+    shape.pairs.map(_.scaled(100)).foreach({ x =>
+      println(s"${x.p1.x}, ${x.p1.y} ");
     })
     shape
   }

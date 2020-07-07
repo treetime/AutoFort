@@ -43,8 +43,8 @@ object PreferredShape {
 
         val shape: ShapeDefinition = {
       var i = 0
-      var angle: Double = 0
       var inc: Double = 2 * Math.PI / n.toDouble //exterior angle
+      var angle: Double = -inc
       var shapePoints: Seq[ShapePoint] = Seq(ShapePoint(0, 0))
       while (i < n - 1) {
         shapePoints.lastOption.foreach { prev =>

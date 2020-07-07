@@ -36,7 +36,7 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
   }
 
   def -(that: AreaDefinition): AreaDefinition = {
-    assert(this contains that, "can't remove what you don't have.")
+    //assert(this contains that, s"can't remove what you don't have. ( ${this.blocks diff blocks}")
     new AreaDefinition(blocks diff that.blocks)
   }
 
@@ -55,7 +55,7 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
   def areaContains(b: GridBlock): Boolean = blocks.exists(_.areaCompare(b))
 
   def isContinuous: Boolean = {
-    perimeter.blocks.forall(b => b.countNeighborsIn(perimeter) >= 2)
+    blocks.forall(b => b.countNeighborsIn(perimeter) >= 2)
   }
 
   def withBlock(block: GridBlock): AreaDefinition =
@@ -97,13 +97,14 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
   }
 
   override def toString: String = {
+    val classified = blocks.map(_.classifyIn(this))
     (0 to yMax)
       .map { py =>
         (0 to xMax)
           .map { px =>
-            blocks.find(_.areaCompare(GridBlock(px, py, 0))) match {
+            classified.find(_.areaCompare(GridBlock(px, py, 0))) match {
               case Some(friend) => friend.toString
-              case None         => "x"
+              case None         => "."
             }
           }
           .mkString("") + s" $py"
