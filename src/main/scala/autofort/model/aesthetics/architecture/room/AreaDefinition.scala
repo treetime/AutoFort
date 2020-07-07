@@ -98,6 +98,7 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
 
   override def toString: String = {
     val classified = blocks.map(_.classifyIn(this))
+    (0 to xMax).map(x => x.toString + (0 until (3 - x.toString.length)).map(_ => " ").mkString).mkString + "\n" +
     (0 to yMax)
       .map { py =>
         (0 to xMax)
@@ -107,7 +108,7 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
               case None         => "."
             }
           }
-          .mkString("") + s" $py"
+          .mkString("  " + Console.RESET) + s" $py" //"  " + Console.RESET
       }
       .mkString("\n")
   }

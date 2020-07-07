@@ -61,9 +61,12 @@ case class GridBlock(x: Int = 0,
   def classifyInCenter(area: AreaDefinition): AreaBlockType = {
     val areas = area.center.subSpaces.rectangularAreas.groupBy(_.area)
     val sizes = areas.keys.toSeq.sorted.reverse
-    areas.collectFirst { case (size, spaces) if spaces.exists(_.contains(this)) =>
-      AreaBlockType(sizes.indexOf(size) + 1)
-    }.getOrElse(AreaBlockType(0))
+    areas
+      .collectFirst {
+        case (size, spaces) if spaces.exists(_.contains(this)) =>
+          AreaBlockType(sizes.indexOf(size) + 1)
+      }
+      .getOrElse(AreaBlockType(0))
   }
 
   def classifyInPerimeter(area: AreaDefinition): PerimeterBlockType = {
@@ -125,17 +128,39 @@ case class GridBlock(x: Int = 0,
   def withItem(item: Item): GridBlock =
     copy(placeable = Option(item))
 
-  override def toString: String = {
+/*  override def toString: String = {
+    classification
+      .map {
+        case WallBlockType    => wall.map(_.toString).getOrElse("?")
+        case AreaBlockType(n) => (n%10).toString
+        case PerimeterBlock   => floor.map(_.toString).getOrElse("?")
+        case InternalCorner   => floor.map(_.toString).getOrElse("?")
+        case ExternalCorner   => floor.map(_.toString).getOrElse("?")
+        case Detachable =>
+          floor
+            .map(_.toString)
+            .getOrElse("?")
+        case _ => floor.map(_.toString).getOrElse("?")
+      }
+      .getOrElse {
+        wall
+          .map(_.toString)
+          .orElse(placeable.map(_.toString))
+          .orElse(floor.map(_.toString))
+          .getOrElse(" ")
+      }
+  }*/
+    override def toString: String = {
     classification
       .map {
         case WallBlockType => wall.map(_.toString).getOrElse("?")
-        case AreaBlockType(n) => Console.BLACK + GridBlock.backgroundPriorities.lift(n).getOrElse("") +  n.toString + Console.RESET
-        case PerimeterBlock =>  Console.YELLOW + floor.map(_.toString).getOrElse("?") + Console.RESET
-        case InternalCorner =>  Console.CYAN + floor.map(_.toString).getOrElse("?") + Console.RESET
-        case ExternalCorner =>  Console.RED + floor.map(_.toString).getOrElse("?") + Console.RESET
+        case AreaBlockType(n) => Console.BLACK + GridBlock.backgroundPriorities.lift(n).getOrElse("") +  n.toString
+        case PerimeterBlock =>  Console.YELLOW + floor.map(_.toString).getOrElse("?")
+        case InternalCorner =>  Console.CYAN + floor.map(_.toString).getOrElse("?")
+        case ExternalCorner =>  Console.RED + floor.map(_.toString).getOrElse("?")
         case Detachable =>      Console.WHITE + floor
-            .map(_.toString)
-            .getOrElse("?") + Console.RESET
+          .map(_.toString)
+          .getOrElse("?")
         case _ => floor.map(_.toString).getOrElse("?")
       }
       .getOrElse {

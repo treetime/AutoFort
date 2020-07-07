@@ -10,11 +10,46 @@ import autofort.model.aesthetics.architecture.shape.ShapePointPair.{
 import autofort.model.map.GridBlock
 
 case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
-  def horizontal: Boolean = p1.y == p2.y
-  def vertical: Boolean = p1.x == p2.x
-
   def intersects(block: GridBlock): Intersection = {
+    val (pMax, pMin) = if (p1.x > p2.x) (p1, p2) else (p2, p1)
     val (yMax, yMin) = if (p1.y > p2.y) (p1.y, p2.y) else (p2.y, p1.y)
+    if (horizontal) {
+      if (block.y == pMin.y) {
+        if (block.x >= pMin.x && block.x < pMax.x) {
+          ON_LINE
+        } else if (block.x < pMin.x) {
+          CUTS_LINE
+        } else {
+          NO_TOUCH
+        }
+      } else {
+        NO_TOUCH
+      }
+    } else if (block.y < yMin || block.y > yMax) {
+      NO_TOUCH
+    } else {
+      if (vertical) {
+        if (block.x == pMin.x) {
+          ON_LINE
+        } else if (block.x < pMin.x) {
+          CUTS_LINE
+        } else {
+          NO_TOUCH
+        }
+      } else {
+        val gradient = (p2.y - p1.y) / (p2.x - p1.x)
+        val intercept = p1.y - p1.x * gradient
+        val x = (block.y - intercept) / gradient
+        if (x == block.x) {
+          ON_LINE
+        } else if (block.x < x && block.y != p2.y) {
+          CUTS_LINE
+        } else {
+          NO_TOUCH
+        }
+      }
+    }
+    /*    val (yMax, yMin) = if (p1.y > p2.y) (p1.y, p2.y) else (p2.y, p1.y)
     if (block.y < yMax && block.y >= yMin) {
       val (pMax, pMin) = if (p1.x > p2.x) (p1, p2) else (p2, p1)
       if (vertical) {
@@ -39,8 +74,12 @@ case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
       }
     } else {
       NO_TOUCH
-    }
+    }*/
   }
+
+  def horizontal: Boolean = p1.y == p2.y
+
+  def vertical: Boolean = p1.x == p2.x
 
   def inBetween(f: ShapePoint => Double, vOther: Double): Boolean = {
     vOther >= Math.min(f(p1), f(p2)) && vOther <= Math.max(f(p1), f(p2))
@@ -59,8 +98,8 @@ case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
 
   def scaled(scale: Double): ShapePointPair =
     copy(
-      p1 = p1.copy(Math.round(p1.x * scale), Math.round(p1.y * scale)),
-      p2 = p2.copy(Math.round(p2.x * scale), Math.round(p2.y * scale))
+      p1 = p1.copy(p1.x * scale, p1.y * scale),
+      p2 = p2.copy(p2.x * scale, p2.y * scale)
     )
 }
 

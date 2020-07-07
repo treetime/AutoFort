@@ -1,20 +1,17 @@
 package autofort.model.aesthetics.architecture.shape
 
-import autofort.model.aesthetics.architecture.shape.ShapeDefinition.{
-  DOWN,
-  LEFT,
-  RIGHT,
-  UP
-}
+import autofort.model.aesthetics.architecture.shape.ShapeDefinition.{DOWN, LEFT, RIGHT, UP}
+
+import scala.math.BigDecimal.RoundingMode
 
 case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
   assert(shapePoints.nonEmpty)
 //  assert(validateShape, "Shape definition incorrect")
 
-  lazy val xMin: Double = shapePoints.map(_.x).min
-  lazy val yMin: Double = shapePoints.map(_.y).min
-  lazy val xMax: Double = shapePoints.map(_.x).max
-  lazy val yMax: Double = shapePoints.map(_.y).max
+  lazy val xMin: Double = shapePoints.map(_.x).minOption.getOrElse(0.0)
+  lazy val yMin: Double = shapePoints.map(_.y).minOption.getOrElse(0.0)
+  lazy val xMax: Double = shapePoints.map(_.x).maxOption.getOrElse(0.0)
+  lazy val yMax: Double = shapePoints.map(_.y).maxOption.getOrElse(0.0)
 
   lazy val width: Double = xMax - xMin
   lazy val height: Double = yMax - yMin
@@ -42,7 +39,7 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
     val yScale = 1.0 / (yMax - yMin)
     val xScale = 1.0 / (xMax - xMin)
     val scalingFactor = Math.max(xScale, yScale)
-    transform(scalingFactor)(
+    transform(
       point =>
         point.copy(
           x = (point.x - xMin) * scalingFactor,
@@ -51,11 +48,23 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
     )
   }
 
-  def transform(
-    scalingFactor: Double
-  )(func: ShapePoint => ShapePoint): ShapeDefinition = {
+  def transform(func: ShapePoint => ShapePoint): ShapeDefinition = {
     copy(shapePoints = shapePoints.map(func))
   }
+
+  def scaled(scale: Double): ShapeDefinition =
+    copy(
+      shapePoints.map(p => p.copy(x = roundAway(p.x * scale), y = roundAway(p.y * scale)))
+    )
+
+  def transfromAndZero(scale: Double): ShapeDefinition = {
+    val scaledArea = scaled(scale)
+    scaledArea.zero()
+  }
+
+  def zero(): ShapeDefinition = transform(p => p.move(-xMin, -yMin))
+
+  private def roundAway(d: Double) = BigDecimal(d).setScale(1, RoundingMode.UP).toDouble
 
 }
 
@@ -77,10 +86,9 @@ object ShapeDefinition {
     val ratio = Math.sqrt(1.0 / impliedArea)
 
     val shape = new ShapeDefinition(
-      points
-        .toIndexedSeq
-        .map(_.move(-xMin, -yMin))
-        .map(
+      points.toIndexedSeq.toIndexedSeq
+        .map(_.move(-xMin - xSize / 2.0, -yMin - ySize / 2.0))
+         .map(
           p =>
             p.copy(
               x = ratio * p.x,
@@ -90,9 +98,11 @@ object ShapeDefinition {
 
     )
 
-    shape.pairs.map(_.scaled(100)).foreach({ x =>
-      println(s"${x.p1.x}, ${x.p1.y} ");
-    })
+    shape.transfromAndZero(scale = 20)
+      .pairs
+      .foreach({ x =>
+        println(s"${x.p1.x}, ${x.p1.y} ");
+      })
     shape
   }
 

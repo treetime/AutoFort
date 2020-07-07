@@ -45,14 +45,14 @@ object SubSpaces {
             Seq(largest, thisArea).maxBy(_.area)
           else largest
         findForCoordinate(x, y, w + 1, h, newLargest)
-      } else if (y + h > area.height) {
+      } else if (y + h > area.yMin + area.height) {
         largest
       } else {
         findForCoordinate(x, y, 1, h + 1, largest)
       }
     }
     val mapped = area.blocks.toVector.map(b => findForCoordinate(b.x, b.y))
-    val max = mapped.groupBy(_.area).maxBy(_._1)._2.minBy(_.leftTop.r)
+    val max = mapped.maxBy(_.area)
     max
     /*    area
         .move(-area.xMin, -area.yMin)

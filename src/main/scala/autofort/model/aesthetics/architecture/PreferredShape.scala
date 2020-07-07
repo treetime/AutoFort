@@ -41,7 +41,7 @@ object PreferredShape {
       ): _*
     )*/
 
-        val shape: ShapeDefinition = {
+    val shape: ShapeDefinition = {
       var i = 0
       var inc: Double = 2 * Math.PI / n.toDouble //exterior angle
       var angle: Double = -inc
@@ -50,13 +50,12 @@ object PreferredShape {
         shapePoints.lastOption.foreach { prev =>
           angle = angle + inc
           shapePoints = shapePoints :+ ShapePoint(
-            round((prev.x + cos(angle)) * 100.0) / 100.0,
-            round((prev.y + sin(angle)) * 100.0) / 100.0,
+            prev.x + cos(angle), prev.y + sin(angle)
           )
         }
         i = i + 1
       }
-      ShapeDefinition.fromPoints(shapePoints:_*)
+      ShapeDefinition.fromPoints(shapePoints: _*)
     }
   }
 }

@@ -9,7 +9,7 @@ import autofort.model.map.GridBlock
 
 case class RoomDefinition(area: AreaDefinition) {
 
-  override def toString: String = area.withWalls().toString
+  override def toString: String = area.withWalls().toString //.withWalls()
 
 
 }
@@ -28,27 +28,27 @@ object RoomDefinition {
         .area
         .toDouble
     ) / bigScale.toDouble*/
-    RoomDefinition(createAreaDefinition(shape, scale))
+    val shapedef = shape.transfromAndZero(scale)
+    RoomDefinition(createAreaDefinition(shapedef))
   }
 
-  private def createAreaDefinition(shape: ShapeDefinition,
-                                   scale: Int): AreaDefinition = {
-    val xMax = Math.round(shape.width * scale).toInt
-    val yMax = Math.round(shape.height * scale).toInt
-    val pairs = shape.pairs.map(_.scaled(scale))
+  private def createAreaDefinition(shape: ShapeDefinition): AreaDefinition = {
+    val xMax = Math.round(shape.width).toInt
+    val yMax = Math.round(shape.height).toInt
+    val pairs = shape.pairs
     //shape.pairs gives rules to determine whether a block is inside or outside the shape
     val validBlocks = blockField(xMax, yMax).filter { block =>
       val (pair,counts) = pairs.map(p => (p, p.intersects(block))).unzip
       val onLine = counts.count(_ == ON_LINE)
       val cutsLine = counts.count(_ == CUTS_LINE)
-      cutsLine % 2 != 0 || (onLine % 2 == 0 && onLine != 0)
+      cutsLine % 2 != 0 || (onLine % 2 == 0 && onLine != 0) || onLine % 2 != 0
     }
     new AreaDefinition(validBlocks)
   }
 
   def blockField(xMax: Int, yMax: Int): Set[GridBlock] = {
-    (0 to yMax).flatMap { py =>
-      (0 to xMax).map { px =>
+    (0 to yMax + 1).flatMap { py =>
+      (0 to xMax + 1).map { px =>
         GridBlock(px, py, 0)
       }
     }.toSet

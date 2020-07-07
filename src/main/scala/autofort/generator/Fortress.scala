@@ -25,15 +25,15 @@ class Fortress(embark: Embark,
 
 object Fortress extends App {
 
-  val population = 30
+  val population = 50
 
   val conf =
-    ArchitectureConfig(WithNoConcernForTheFuture(), nGon(4), ConnectionConfig())
+    ArchitectureConfig(WithNoConcernForTheFuture(), nGon(8), ConnectionConfig())
 
   val room = new Shelter().generate(population, conf)
 
   println(room.toString)
-  println(s"${room.area.width} x ${room.area.height} = ${room.area.area}")
+  println(s"${room.area.width + 1} x ${room.area.height + 1} = ${room.area.area}")
 
 /*  val subSpaces = room.area.subSpaces
 
