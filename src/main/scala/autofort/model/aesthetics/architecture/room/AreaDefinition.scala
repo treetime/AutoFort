@@ -1,5 +1,6 @@
 package autofort.model.aesthetics.architecture.room
 
+import autofort.model.aesthetics.architecture.room
 import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
 import autofort.model.map.{GridBlock, WallTile}
 
@@ -25,15 +26,20 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
   def attachTo(other: AreaDefinition,
                direction: Direction = RIGHT): AreaDefinition =
     direction match {
-      case UP    => new AreaDefinition(zeroAt(other.xMin, other.yMax))
-      case RIGHT => new AreaDefinition(zeroAt(other.xMax, other.yMin))
+      case UP    => zeroAt(other.xMin, other.yMax)
+      case RIGHT => zeroAt(other.xMax, other.yMin)
       case LEFT  => other.attachTo(this, RIGHT)
       case DOWN  => other.attachTo(this, UP)
     }
 
-  def zeroAt(x: Int, y: Int): Set[GridBlock] = {
+ /* def zeroAt(x: Int, y: Int): Set[GridBlock] = {
     blocks.map(_.move(x - xMin, y - yMin))
+  }*/
+
+  def zeroAt(x: Int, y: Int): AreaDefinition = {
+    new AreaDefinition(blocks.map(_.move(x - xMin, y - yMin)))
   }
+
 
   def -(that: AreaDefinition): AreaDefinition = {
     //assert(this contains that, s"can't remove what you don't have. ( ${this.blocks diff blocks}")
@@ -69,10 +75,10 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
   }
 
   def flipVertical: AreaDefinition =
-    new AreaDefinition(blocks.map(_.flipVertical(yMax).move(0, -yMax)))
+    new AreaDefinition(blocks.map(_.flipVertical(yMax)))
 
   def flipHorizontal: AreaDefinition =
-    new AreaDefinition(blocks.map(_.flipHorizontal(xMax).move(-xMax, 0)))
+    new AreaDefinition(blocks.map(_.flipHorizontal(xMax)))
 
   def flipXY: AreaDefinition = new AreaDefinition(blocks.map(_.transpose))
 
@@ -108,7 +114,7 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
               case None         => "."
             }
           }
-          .mkString("  " + Console.RESET) + s" $py" //"  " + Console.RESET
+          .mkString("  ") + s" $py" //"  " + Console.RESET
       }
       .mkString("\n")
   }

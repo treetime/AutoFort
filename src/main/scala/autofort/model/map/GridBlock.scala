@@ -128,7 +128,7 @@ case class GridBlock(x: Int = 0,
   def withItem(item: Item): GridBlock =
     copy(placeable = Option(item))
 
-/*  override def toString: String = {
+  override def toString: String = {
     classification
       .map {
         case WallBlockType    => wall.map(_.toString).getOrElse("?")
@@ -149,12 +149,12 @@ case class GridBlock(x: Int = 0,
           .orElse(floor.map(_.toString))
           .getOrElse(" ")
       }
-  }*/
-    override def toString: String = {
+  }
+/*    override def toString: String = {
     classification
       .map {
         case WallBlockType => wall.map(_.toString).getOrElse("?")
-        case AreaBlockType(n) => Console.BLACK + GridBlock.backgroundPriorities.lift(n).getOrElse("") +  n.toString
+        case AreaBlockType(n) => GridBlock.backgroundPriorities.lift(n).getOrElse("") +  n.toString
         case PerimeterBlock =>  Console.YELLOW + floor.map(_.toString).getOrElse("?")
         case InternalCorner =>  Console.CYAN + floor.map(_.toString).getOrElse("?")
         case ExternalCorner =>  Console.RED + floor.map(_.toString).getOrElse("?")
@@ -171,7 +171,7 @@ case class GridBlock(x: Int = 0,
           .getOrElse(" ")
       }
 
-  }
+  }*/
 }
 
 object GridBlock {

@@ -1,6 +1,8 @@
 package autofort.model.aesthetics.architecture.shape
 
 import autofort.model.aesthetics.architecture.shape.ShapeDefinition.{DOWN, LEFT, RIGHT, UP}
+import autofort.model.aesthetics.architecture.shape.ShapePointPair.CUTS_LINE
+import autofort.model.map.GridBlock
 
 import scala.math.BigDecimal.RoundingMode
 
@@ -52,19 +54,28 @@ case class ShapeDefinition(shapePoints: IndexedSeq[ShapePoint]) {
     copy(shapePoints = shapePoints.map(func))
   }
 
-  def scaled(scale: Double): ShapeDefinition =
-    copy(
-      shapePoints.map(p => p.copy(x = roundAway(p.x * scale), y = roundAway(p.y * scale)))
-    )
-
-  def transfromAndZero(scale: Double): ShapeDefinition = {
+  def transformAndZero(scale: Double): ShapeDefinition = {
     val scaledArea = scaled(scale)
     scaledArea.zero()
   }
 
+  def scaled(scale: Double): ShapeDefinition =
+    copy(
+      shapePoints.map(
+        p => p.copy(x = roundAway(p.x * scale), y = roundAway(p.y * scale))
+      )
+    )
+
+  private def roundAway(d: Double) =
+    BigDecimal(d).setScale(1, RoundingMode.UP).toDouble
+
   def zero(): ShapeDefinition = transform(p => p.move(-xMin, -yMin))
 
-  private def roundAway(d: Double) = BigDecimal(d).setScale(1, RoundingMode.UP).toDouble
+  def isInside(block: GridBlock): Boolean = {
+    val results = pairs.map(_.intersect(block))
+      results.flatten.count(_ == CUTS_LINE) % 2 != 0
+  }
+
 
 }
 
@@ -88,21 +99,9 @@ object ShapeDefinition {
     val shape = new ShapeDefinition(
       points.toIndexedSeq.toIndexedSeq
         .map(_.move(-xMin - xSize / 2.0, -yMin - ySize / 2.0))
-         .map(
-          p =>
-            p.copy(
-              x = ratio * p.x,
-              y = ratio * p.y
-          )
-        )
-
+        .map(p => p.copy(x = ratio * p.x, y = ratio * p.y))
     )
 
-    shape.transfromAndZero(scale = 20)
-      .pairs
-      .foreach({ x =>
-        println(s"${x.p1.x}, ${x.p1.y} ");
-      })
     shape
   }
 

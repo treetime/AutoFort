@@ -4,85 +4,79 @@ import autofort.model.aesthetics.architecture.shape.ShapeDefinition._
 import autofort.model.aesthetics.architecture.shape.ShapePointPair.{
   CUTS_LINE,
   Intersection,
-  NO_TOUCH,
   ON_LINE
 }
 import autofort.model.map.GridBlock
 
 case class ShapePointPair(idx: Int, p1: ShapePoint, p2: ShapePoint) {
-  def intersects(block: GridBlock): Intersection = {
-    val (pMax, pMin) = if (p1.x > p2.x) (p1, p2) else (p2, p1)
-    val (yMax, yMin) = if (p1.y > p2.y) (p1.y, p2.y) else (p2.y, p1.y)
-    if (horizontal) {
-      if (block.y == pMin.y) {
-        if (block.x >= pMin.x && block.x < pMax.x) {
-          ON_LINE
-        } else if (block.x < pMin.x) {
-          CUTS_LINE
-        } else {
-          NO_TOUCH
-        }
-      } else {
-        NO_TOUCH
-      }
-    } else if (block.y < yMin || block.y > yMax) {
-      NO_TOUCH
+
+  def intersect(block: GridBlock): Option[Intersection] = {
+    if (afterThis(block)) {
+      None
     } else {
+      val (x, y) = (block.x, block.y)
       if (vertical) {
-        if (block.x == pMin.x) {
-          ON_LINE
-        } else if (block.x < pMin.x) {
-          CUTS_LINE
+        if (p2.isAbove(p1)) {
+          if (y < p2.y && y >= p1.y) {
+            if (p1.x == x) { Option(ON_LINE) } else { Option(CUTS_LINE) }
+          } else {
+            None
+          }
         } else {
-          NO_TOUCH
+          if (y <= p1.y && y > p2.y) {
+            if (p2.x == x) { Option(ON_LINE) } else { Option(CUTS_LINE) }
+          } else {
+            None
+          }
+        }
+      } else if (horizontal) {
+        if (y != p1.y) {
+          None
+        } else {
+          if (p2.x > p1.x) {
+            if (x >= p1.x && x < p2.x) {
+              Option(ON_LINE)
+            } else if (x < p1.x) {
+              Option(CUTS_LINE)
+            } else {
+              None
+            }
+          } else {
+            if (x > p2.x && x <= p1.x) {
+              Option(ON_LINE)
+            } else if (x < p2.x) {
+              Option(CUTS_LINE)
+            } else {
+              None
+            }
+          }
         }
       } else {
         val gradient = (p2.y - p1.y) / (p2.x - p1.x)
-        val intercept = p1.y - p1.x * gradient
-        val x = (block.y - intercept) / gradient
-        if (x == block.x) {
-          ON_LINE
-        } else if (block.x < x && block.y != p2.y) {
-          CUTS_LINE
+        val intercept = p1.y - gradient * p1.x
+        val intersectX = (y - intercept) / gradient
+
+        if (x == intersectX) {
+          Option(ON_LINE)
+        } else if (x < intersectX) {
+          if (p2.isAbove(p1)) {
+            Option.when(y >= p1.y && y < p2.y)(CUTS_LINE)
+          } else {
+            Option.when(y <= p1.y && y > p2.y)(CUTS_LINE)
+          }
         } else {
-          NO_TOUCH
+          None
         }
       }
     }
-    /*    val (yMax, yMin) = if (p1.y > p2.y) (p1.y, p2.y) else (p2.y, p1.y)
-    if (block.y < yMax && block.y >= yMin) {
-      val (pMax, pMin) = if (p1.x > p2.x) (p1, p2) else (p2, p1)
-      if (vertical) {
-        if (block.x == Math.round(pMax.x).toInt) ON_LINE
-        else if (block.x < Math.floor(pMin.x)) CUTS_LINE
-        else NO_TOUCH
-      } else if (horizontal) {
-        if (block.x >= Math.floor(pMin.x) && block.x < Math.ceil(pMax.x)) ON_LINE
-        else if (block.x < Math.floor(pMin.x) || block.x > Math.ceil(pMax.x)) CUTS_LINE
-        else NO_TOUCH
-      } else {
-        val gradient = (pMax.y - pMin.y) / (pMax.x - pMin.x)
-        val intercept = pMin.y - pMin.x * gradient
-        val x = Math.round((block.y - intercept) / gradient)
-        if (x == block.x) {
-          ON_LINE
-        } else if (block.x < x) {
-          CUTS_LINE
-        } else {
-          NO_TOUCH
-        }
-      }
-    } else {
-      NO_TOUCH
-    }*/
   }
 
   def horizontal: Boolean = p1.y == p2.y
 
   def vertical: Boolean = p1.x == p2.x
 
-  def inBetween(f: ShapePoint => Double, vOther: Double): Boolean = {
-    vOther >= Math.min(f(p1), f(p2)) && vOther <= Math.max(f(p1), f(p2))
+  def afterThis(block: GridBlock): Boolean = {
+    block.x > Math.max(p1.x, p2.x)
   }
 
   def direction: Direction = (p1.x, p2.x, p1.y, p2.y) match {
@@ -111,6 +105,5 @@ object ShapePointPair {
   trait Intersection
   case object ON_LINE extends Intersection
   case object CUTS_LINE extends Intersection
-  case object NO_TOUCH extends Intersection
 
 }

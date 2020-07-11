@@ -25,7 +25,7 @@ class Fortress(embark: Embark,
 
 object Fortress extends App {
 
-  val population = 50
+  val population = 85
 
   val conf =
     ArchitectureConfig(WithNoConcernForTheFuture(), nGon(8), ConnectionConfig())
