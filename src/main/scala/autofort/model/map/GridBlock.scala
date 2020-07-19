@@ -48,7 +48,7 @@ case class GridBlock(x: Int = 0,
       } else {
         (new AreaDefinition(), area)
       }
-    if (unwalled.center.contains(this)) {
+    if (unwalled.contains(this)) {
       //AreaBlockType(0)
       classifyInCenter(unwalled)
     } else if (walls.contains(this)) {
@@ -59,7 +59,7 @@ case class GridBlock(x: Int = 0,
   }
 
   def classifyInCenter(area: AreaDefinition): AreaBlockType = {
-    val areas = area.center.subSpaces.rectangularAreas.groupBy(_.area)
+    val areas = area.subSpaces.rectangularAreas.groupBy(_.area)
     val sizes = areas.keys.toSeq.sorted.reverse
     areas
       .collectFirst {
@@ -88,9 +88,10 @@ case class GridBlock(x: Int = 0,
   def isExternalCornerOf(area: AreaDefinition): Boolean = {
     val neighbors = getNeighborsIn(area.perimeter, !_.isDetachable(area))
     val dirs = neighbors.flatMap(cardinalDirection)
+    val internalCorners = neighbors.count(_.isInternalCornerOf(area))
     dirs.size == 2 && dirs
       .map(Alignment.fromDirection)
-      .size == 2
+      .size == 2 && internalCorners < 2
   }
 
   def isDetachable(area: AreaDefinition): Boolean =
@@ -131,11 +132,12 @@ case class GridBlock(x: Int = 0,
   override def toString: String = {
     classification
       .map {
-        case WallBlockType    => wall.map(_.toString).getOrElse("?")
-        case AreaBlockType(n) => (n%10).toString
-        case PerimeterBlock   => floor.map(_.toString).getOrElse("?")
-        case InternalCorner   => floor.map(_.toString).getOrElse("?")
-        case ExternalCorner   => floor.map(_.toString).getOrElse("?")
+        case WallBlockType => wall.map(_.toString).getOrElse("?")
+        case AreaBlockType(n) =>
+          floor.map(_.toString).getOrElse("?") //(n%10).toString
+        case PerimeterBlock => floor.map(_.toString).getOrElse("?")
+        case InternalCorner => floor.map(_.toString).getOrElse("?")
+        case ExternalCorner => floor.map(_.toString).getOrElse("?")
         case Detachable =>
           floor
             .map(_.toString)
@@ -150,17 +152,22 @@ case class GridBlock(x: Int = 0,
           .getOrElse(" ")
       }
   }
-/*    override def toString: String = {
+  def toString2: String = {
     classification
       .map {
         case WallBlockType => wall.map(_.toString).getOrElse("?")
-        case AreaBlockType(n) => GridBlock.backgroundPriorities.lift(n).getOrElse("") +  n.toString
-        case PerimeterBlock =>  Console.YELLOW + floor.map(_.toString).getOrElse("?")
-        case InternalCorner =>  Console.CYAN + floor.map(_.toString).getOrElse("?")
-        case ExternalCorner =>  Console.RED + floor.map(_.toString).getOrElse("?")
-        case Detachable =>      Console.WHITE + floor
-          .map(_.toString)
-          .getOrElse("?")
+        case AreaBlockType(n) =>
+          GridBlock.backgroundPriorities.lift(n - 1).getOrElse("") + (n % 10).toString
+        case PerimeterBlock =>
+          Console.YELLOW + floor.map(_.toString).getOrElse("?")
+        case InternalCorner =>
+          Console.CYAN + floor.map(_.toString).getOrElse("?")
+        case ExternalCorner =>
+          Console.RED + floor.map(_.toString).getOrElse("?")
+        case Detachable =>
+          Console.WHITE + floor
+            .map(_.toString)
+            .getOrElse("?")
         case _ => floor.map(_.toString).getOrElse("?")
       }
       .getOrElse {
@@ -171,20 +178,20 @@ case class GridBlock(x: Int = 0,
           .getOrElse(" ")
       }
 
-  }*/
+  }
 }
 
 object GridBlock {
 
   val backgroundPriorities = Seq(
-    Console.BLACK_B,
     Console.WHITE_B,
     Console.YELLOW_B,
     Console.RED_B,
     Console.MAGENTA_B,
     Console.CYAN_B,
     Console.GREEN_B,
-    Console.BLUE_B
+    Console.BLUE_B,
+    Console.BLACK_B,
   )
 
 }

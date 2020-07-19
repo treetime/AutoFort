@@ -10,7 +10,9 @@ case class RoomDefinition(area: AreaDefinition) {
 
   override def toString: String = area.toString //.withWalls()
 
-  def toString2: String = area.withWalls().toString //.withWalls()
+  def toString2: String = area.withWalls().toString2 //.withWalls()
+
+  def toString3: String = area.withWalls().toString //.withWalls()
 
 }
 

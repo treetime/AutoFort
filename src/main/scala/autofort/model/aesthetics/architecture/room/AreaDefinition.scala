@@ -14,6 +14,7 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
     if (width > height) (width, height) else (height, width)
   lazy val area: Int = blocks.size
   lazy val xMin: Int = xBlocks.minOption.getOrElse(0)
+
   lazy val xMax: Int = xBlocks.maxOption.getOrElse(0)
   lazy val yMin: Int = yBlocks.minOption.getOrElse(0)
   lazy val yMax: Int = yBlocks.maxOption.getOrElse(0)
@@ -117,6 +118,23 @@ class AreaDefinition(val blocks: Set[GridBlock] = Set.empty) {
           .mkString("  ") + s" $py" //"  " + Console.RESET
       }
       .mkString("\n")
+  }
+
+  def toString2: String = {
+    val classified = blocks.map(_.classifyIn(this))
+    (0 to xMax).map(x => x.toString + (0 until (3 - x.toString.length)).map(_ => " ").mkString).mkString + "\n" +
+      (0 to yMax)
+        .map { py =>
+          (0 to xMax)
+            .map { px =>
+              classified.find(_.areaCompare(GridBlock(px, py, 0))) match {
+                case Some(friend) => friend.toString2
+                case None         => "."
+              }
+            }
+            .mkString("  "+ Console.RESET) + s" $py" //"  " + Console.RESET
+        }
+        .mkString("\n")
   }
 
   def withWalls(): AreaDefinition = {

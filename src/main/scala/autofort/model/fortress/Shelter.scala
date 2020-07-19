@@ -18,9 +18,9 @@ class Shelter extends FortressComponent {
     Seq(DiningRoomSet(Lines(Alignment.LATERAL), FillPercent(1, 0.8)))
   )
 
-  def generate(population: Int,
+  def generate(scale: Int,
                architecture: ArchitectureConfig): RoomDefinition = {
-    areaConfig.generateRoom(architecture, population)
+    areaConfig.generateRoom(architecture, scale)
   }
 
 }

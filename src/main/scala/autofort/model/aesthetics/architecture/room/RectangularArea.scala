@@ -1,5 +1,7 @@
 package autofort.model.aesthetics.architecture.room
 
+import autofort.model.aesthetics.preferences.Orientation
+import autofort.model.aesthetics.preferences.Orientation.{HORIZONTAL, VERTICAL}
 import autofort.model.map.GridBlock
 
 case class RectangularArea(override val blocks: Set[GridBlock])
@@ -25,7 +27,7 @@ case class RectangularArea(override val blocks: Set[GridBlock])
     area.containsArea(this)
   }
 
-
+  def orientation: Orientation = if (width >= height) HORIZONTAL else VERTICAL
 
 }
 

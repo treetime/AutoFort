@@ -1,5 +1,6 @@
 package autofort.model.aesthetics.architecture.room
 
+import autofort.model.aesthetics.preferences.Orientation.{HORIZONTAL, VERTICAL}
 import autofort.model.map.GridBlock
 
 case class SubSpaces(rectangularAreas: Seq[RectangularArea])
@@ -41,9 +42,9 @@ object SubSpaces {
       if (area.areaContains(GridBlock(x + w - 1, y + h - 1))) {
         val thisArea = RectangularArea(w, h).move(x, y)
         val newLargest =
-          if (thisArea.subsetOf(area))
-            Seq(largest, thisArea).maxBy(_.area)
-          else largest
+          if (thisArea.subsetOf(area)) {
+            chooseLargest(Seq(largest, thisArea))
+          } else largest
         findForCoordinate(x, y, w + 1, h, newLargest)
       } else if (y + h > area.yMin + area.height) {
         largest
@@ -52,7 +53,7 @@ object SubSpaces {
       }
     }
     val mapped = area.blocks.toVector.map(b => findForCoordinate(b.x, b.y))
-    val max = mapped.maxBy(_.area)
+    val max = chooseLargest(mapped)
     max
     /*    area
         .move(-area.xMin, -area.yMin)
@@ -61,6 +62,11 @@ object SubSpaces {
       .maxBy(_.area)
       .move(area.xMin, area.yMin)*/
 
+  }
+
+  def chooseLargest(areas: Seq[RectangularArea]): RectangularArea = {
+    val groups = areas.groupBy(_.area).maxBy(_._1)._2.groupBy(_.orientation)
+    groups.get(HORIZONTAL).flatMap(_.headOption).getOrElse(groups(VERTICAL).head)
   }
 
 }
